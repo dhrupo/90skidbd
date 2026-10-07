@@ -313,6 +313,11 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .btn-red { margin-top: 4px; background: var(--card); color: var(--red); border: 2px solid var(--red); box-shadow: 3px 3px 0 var(--red); }
 .btn-red.copied { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
 
+.footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
+.footer p { margin: 0; }
+.footer a { color: var(--blue); overflow-wrap: anywhere; }
+.footer .credit { margin-top: 10px; font-size: 11px; color: #6A5841B3; }
+
 .card[aria-pressed="true"] .tick { animation: tick-in .32s var(--spring) both; }
 .card[aria-pressed="true"] .remembered { animation: fade-up .16s .16s ease-out both; }
 .card .tick.erasing { opacity: 1; animation: erase .2s ease-in both; }
