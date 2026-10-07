@@ -34,6 +34,7 @@ body {
 
 .page {
   position: relative;
+  overflow-x: clip;
   padding: 24px 20px 48px 40px;
   background:
     linear-gradient(90deg, transparent 27px, var(--margin) 27px, var(--margin) 29px, transparent 29px),
@@ -232,3 +233,28 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   transition: opacity .2s, transform .2s;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.card[aria-pressed="true"] .tick { animation: tick-in .32s var(--spring) both; }
+.card[aria-pressed="true"] .remembered { animation: fade-up .16s .16s ease-out both; }
+.card .tick.erasing { opacity: 1; animation: erase .2s ease-in both; }
+.meter-value.bump { animation: roll-up .24s ease-out; }
+.meter-bar.glow { animation: glow .28s ease-out; }
+.chapter.stamped .chapter-count { animation: stamp .38s var(--spring); }
+
+@keyframes tick-in { from { opacity: 0; transform: scale(1.3) rotate(-10deg); } to { opacity: 1; transform: none; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes erase {
+  0% { opacity: 1; transform: none; }
+  25% { transform: translateX(-4px) rotate(-3deg); }
+  50% { transform: translateX(4px) rotate(3deg); }
+  75% { transform: translateX(-3px); opacity: .5; }
+  100% { opacity: 0; transform: none; }
+}
+@keyframes roll-up { from { opacity: 0; transform: translateY(60%); } to { opacity: 1; transform: none; } }
+@keyframes glow { 50% { box-shadow: 0 0 0 3px #1E7B3440; } }
+@keyframes stamp { from { transform: scale(1.6) rotate(-14deg); } to { transform: rotate(-4deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, ::before, ::after { animation: none !important; transition-duration: 0s !important; }
+}

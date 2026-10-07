@@ -36,6 +36,24 @@ document.getElementById('chapters').innerHTML = CHAPTERS.map((c, i) => `
   </section>`).join('');
 
 const counter = document.querySelector('[data-testid="counter"]');
+const toastEl = document.querySelector('.toast');
+let toastTimer;
+let halfwayShown = false;
+
+function toast(text) {
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+function replay(el, cls) {
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+
+const chapterDone = (c) => ITEMS.every((it) => it.chapter !== c.id || ticked.has(it.id));
 
 function render() {
   counter.textContent = bn(`${ticked.size}/${TOTAL}`);
@@ -61,6 +79,27 @@ document.getElementById('chapters').addEventListener('click', (e) => {
   card.setAttribute('aria-pressed', on);
   save();
   render();
+  replay(counter, 'bump');
+  replay(document.querySelector('.meter-bar'), 'glow');
+
+  if (!on) {
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const tick = card.querySelector('.tick');
+      replay(tick, 'erasing');
+      setTimeout(() => tick.classList.remove('erasing'), 200);
+    }
+    toast('আচ্ছা, ভুল হইতেই পারে 😅');
+    return;
+  }
+  card.querySelector('.tick').classList.remove('erasing');
+  const chapter = CHAPTERS.find((c) => c.id === ITEMS.find((it) => it.id === id).chapter);
+  if (chapterDone(chapter)) replay(document.getElementById(`ch-${chapter.id}`), 'stamped');
+  if (ticked.size === TOTAL / 2 && !halfwayShown) {
+    halfwayShown = true;
+    toast('অর্ধেক শেষ! চা খাবা? ☕');
+  } else if (chapterDone(chapter)) {
+    toast(chapter.done);
+  }
 });
 
 render();
