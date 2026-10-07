@@ -260,6 +260,22 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .scheme .you-mark { margin-left: 6px; font-size: 13px; white-space: nowrap; }
 .result.reveal .score-ring svg { animation: draw .9s ease-out both; }
 
+.share { margin-top: 32px; }
+.share-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.share-head h3 { font: 700 15px var(--body); }
+.share-head p { margin: 0; font: 400 13px var(--hand); color: var(--blue); }
+.share-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  margin: 10px 0 20px;
+  background: var(--paper-deep);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px #2B21181F, 0 8px 18px -8px #2B211859;
+}
+.btn[aria-busy="true"] { opacity: .7; cursor: progress; }
+
 .card[aria-pressed="true"] .tick { animation: tick-in .32s var(--spring) both; }
 .card[aria-pressed="true"] .remembered { animation: fade-up .16s .16s ease-out both; }
 .card .tick.erasing { opacity: 1; animation: erase .2s ease-in both; }

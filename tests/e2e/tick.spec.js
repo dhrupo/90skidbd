@@ -5,7 +5,7 @@ const counter = (page) => page.getByTestId('counter');
 
 test('tapping a memory ticks it, tapping again unticks it', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('button', { pressed: false })).toHaveCount(48);
+  await expect(page.locator('#chapters').getByRole('button', { pressed: false })).toHaveCount(48);
   await expect(counter(page)).toHaveText('০/৪৮');
 
   await card(page, 'আলিফ লায়লা').click();

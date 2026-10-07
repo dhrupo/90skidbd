@@ -1,5 +1,6 @@
 import { CHAPTERS, ITEMS } from './items.js';
 import { bn, percent, tier, TIERS } from './score.js';
+import { drawShare, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
@@ -88,12 +89,46 @@ function renderResult() {
   result.querySelector('.remark').textContent = remark(pct, TOTAL - ticked.size);
   document.getElementById('scheme').innerHTML = TIERS.map((x, i) =>
     `<tr${x === t ? ' class="you"' : ''}><td>${RANGES[i]}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
-  if (revealed) scoreEl.textContent = bn(pct) + '%';
+  if (revealed) {
+    scoreEl.textContent = bn(pct) + '%';
+    schedulePreview();
+  }
 }
+
+const preview = document.querySelector('.share-preview');
+const shareBtn = document.getElementById('share-btn');
+let shareBlob = null;
+let previewTimer;
+
+async function updatePreview() {
+  const blob = await drawShare(new Set(ticked));
+  shareBlob = blob;
+  const old = preview.src;
+  preview.src = URL.createObjectURL(blob);
+  if (old) URL.revokeObjectURL(old);
+}
+
+function schedulePreview() {
+  shareBlob = null;
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(updatePreview, 300);
+}
+
+shareBtn.addEventListener('click', async () => {
+  shareBtn.setAttribute('aria-busy', 'true');
+  try {
+    await shareImage(shareBlob || await drawShare(new Set(ticked)));
+  } catch {
+    toast('শেয়ার হইল না 😕 আবার চাপো তো');
+  } finally {
+    shareBtn.removeAttribute('aria-busy');
+  }
+});
 
 new IntersectionObserver(([entry], obs) => {
   if (!entry.isIntersecting) return;
   revealed = true;
+  updatePreview();
   result.classList.add('reveal');
   countUp(percent(ticked.size, TOTAL));
   obs.disconnect();
