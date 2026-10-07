@@ -288,7 +288,10 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   box-shadow: 0 1px 3px #2B211840;
 }
 .scheme-fold { margin-top: 16px; }
-.scheme-fold summary { min-height: 44px; display: flex; align-items: center; font: 700 14px var(--body); color: var(--muted); cursor: pointer; }
+.scheme-fold summary { min-height: 44px; display: flex; align-items: center; gap: 8px; font: 700 14px var(--body); color: var(--muted); cursor: pointer; list-style: none; }
+.scheme-fold summary::-webkit-details-marker { display: none; }
+.scheme-fold summary::before { content: '▸'; color: var(--blue); transition: transform .15s ease-out; }
+.scheme-fold[open] summary::before { transform: rotate(90deg); }
 .result-card {
   margin-top: 16px;
   padding: 20px;
