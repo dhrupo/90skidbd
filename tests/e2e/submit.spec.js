@@ -37,3 +37,25 @@ test('the button opens a pop-up report card with share and challenge', async ({ 
   await expect(dialog.getByRole('button', { name: /পোস্ট মারো/ })).toBeVisible();
   await expect(dialog.getByLabel('তোমার নাম')).toBeVisible();
 });
+
+const dialogOf = (page) => page.getByRole('dialog', { name: /রেজাল্ট বের হইছে/ });
+
+for (const [how, close] of [
+  ['the ✕ button', (page) => dialogOf(page).getByRole('button', { name: 'বন্ধ করো' }).click()],
+  ['Escape', (page) => page.keyboard.press('Escape')],
+  ['a tap on the dark backdrop', (page) => page.mouse.click(5, 5)],
+  ['the back gesture', (page) => page.goBack()],
+]) {
+  test(`${how} closes the pop-up and keeps you on the page`, async ({ page }) => {
+    await page.goto('/');
+    await tick(page, 2);
+    await bar(page).getByRole('button').click();
+    await expect(dialogOf(page)).toBeVisible();
+    await close(page);
+    await expect(dialogOf(page)).toBeHidden();
+    await expect(page).toHaveURL(/localhost:4173\/$/);
+    await expect.poll(() => page.evaluate(() => history.state?.result ?? null)).toBeNull();
+    await expect(page.locator('#chapters .card[aria-pressed="true"]')).toHaveCount(2);
+    await expect(bar(page).getByRole('button')).toHaveText(/আবার দেখি/);
+  });
+}
