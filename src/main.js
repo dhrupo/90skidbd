@@ -1,5 +1,5 @@
 import { CHAPTERS, ITEMS } from './items.js';
-import { bn } from './score.js';
+import { bn, percent, tier, TIERS } from './score.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
@@ -53,6 +53,52 @@ function replay(el, cls) {
   el.classList.add(cls);
 }
 
+const RANGES = ['০–২৫%', '২৬–৫০%', '৫১–৮০%', '৮১%+'];
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const result = document.getElementById('result');
+const scoreEl = result.querySelector('[data-testid="score"]');
+let revealed = false;
+
+function remark(pct, missed) {
+  const sign = ' — ক্লাস টিচার';
+  if (pct === 0) return 'আগে উপরে কিছু টিক দাও, তারপর রেজাল্ট 😑';
+  if (pct === 100) return 'সব মনে আছে?! তুমি তো চলমান জাদুঘর 🏛️' + sign;
+  if (pct <= 25) return 'এগুলা তোমার আব্বা-আম্মুর জিনিস, বুঝছি। তুমি টিকটক দেখো 😌' + sign;
+  if (pct <= 50) return 'অর্ধেক মনে আছে, বাকি অর্ধেক ইউটিউবে দেখছো। ঠিক বলছি না?' + sign;
+  if (pct <= 80) return `খারাপ না! কিন্তু ${bn(missed)}টা ভুলে গেলা কেমনে? আম্মুকে একটা ফোন দাও।` + sign;
+  return `${bn(missed)}টা মিস? চলো মাফ করলাম, বিটিভির লোগো বলে কথা!` + sign;
+}
+
+function countUp(to) {
+  if (reduceMotion()) { scoreEl.textContent = bn(to) + '%'; return; }
+  const start = performance.now();
+  const step = (now) => {
+    const t = Math.min(1, (now - start) / 900);
+    scoreEl.textContent = bn(Math.round(to * (1 - (1 - t) ** 3))) + '%';
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function renderResult() {
+  const pct = percent(ticked.size, TOTAL);
+  const t = TIERS.find((x) => x.title === tier(pct));
+  result.querySelector('.result-count').textContent = `${bn(TOTAL)}টার মধ্যে ${bn(ticked.size)}টা চিনছো`;
+  result.querySelector('.rank').textContent = `${t.title} ${t.emoji}`;
+  result.querySelector('.remark').textContent = remark(pct, TOTAL - ticked.size);
+  document.getElementById('scheme').innerHTML = TIERS.map((x, i) =>
+    `<tr${x === t ? ' class="you"' : ''}><td>${RANGES[i]}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
+  if (revealed) scoreEl.textContent = bn(pct) + '%';
+}
+
+new IntersectionObserver(([entry], obs) => {
+  if (!entry.isIntersecting) return;
+  revealed = true;
+  result.classList.add('reveal');
+  countUp(percent(ticked.size, TOTAL));
+  obs.disconnect();
+}, { threshold: 0.4 }).observe(result);
+
 const chapterDone = (c) => ITEMS.every((it) => it.chapter !== c.id || ticked.has(it.id));
 
 function render() {
@@ -68,6 +114,7 @@ function render() {
     document.getElementById(`ch-${c.id}`).classList.toggle('done', done);
     document.querySelector(`[data-chip="${c.id}"]`).classList.toggle('done', done);
   }
+  renderResult();
 }
 
 document.getElementById('chapters').addEventListener('click', (e) => {
@@ -83,7 +130,7 @@ document.getElementById('chapters').addEventListener('click', (e) => {
   replay(document.querySelector('.meter-bar'), 'glow');
 
   if (!on) {
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!reduceMotion()) {
       const tick = card.querySelector('.tick');
       replay(tick, 'erasing');
       setTimeout(() => tick.classList.remove('erasing'), 200);

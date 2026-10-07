@@ -42,6 +42,28 @@
     </nav>
 
     <div id="chapters"></div>
+
+    <section class="result" id="result" aria-labelledby="h-result">
+      <p class="chapter-kicker">শেষ পাতা</p>
+      <h2 id="h-result">রেজাল্ট বের হইছে! <span aria-hidden="true">📝</span></h2>
+      <div class="result-card">
+        <div class="result-top">
+          <div class="score-ring">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 8c30 1 52 22 52 52s-23 52-53 51C29 110 8 89 9 59 10 31 31 10 64 9" pathLength="100"/></svg>
+            <span data-testid="score">০%</span>
+          </div>
+          <div>
+            <p class="result-count"></p>
+            <p class="rank" data-testid="rank"></p>
+          </div>
+        </div>
+        <p class="remark" data-testid="remark"></p>
+        <table class="scheme">
+          <caption>মার্কিং স্কিম</caption>
+          <tbody id="scheme"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <div class="toast" role="status" aria-live="polite"></div>
