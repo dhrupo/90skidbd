@@ -9,14 +9,14 @@ test('32 of 48 remembered rounds to 67%', () => {
 });
 
 test('each score band gets its title, edges included', () => {
-  assert.equal(tier(0), '২০০০-এর পরের বাচ্চা');
-  assert.equal(tier(25), '২০০০-এর পরের বাচ্চা');
-  assert.equal(tier(26), 'আধা নব্বই, আধা ইউটিউব');
-  assert.equal(tier(50), 'আধা নব্বই, আধা ইউটিউব');
-  assert.equal(tier(51), 'পাক্কা নব্বইয়ের পোলাপান');
-  assert.equal(tier(80), 'পাক্কা নব্বইয়ের পোলাপান');
-  assert.equal(tier(81), 'বিটিভির লোগো তুমি নিজেই');
-  assert.equal(tier(100), 'বিটিভির লোগো তুমি নিজেই');
+  assert.equal(tier(0).title, '২০০০-এর পরের বাচ্চা');
+  assert.equal(tier(25).title, '২০০০-এর পরের বাচ্চা');
+  assert.equal(tier(26).title, 'আধা নব্বই, আধা ইউটিউব');
+  assert.equal(tier(50).title, 'আধা নব্বই, আধা ইউটিউব');
+  assert.equal(tier(51).title, 'পাক্কা নব্বইয়ের পোলাপান');
+  assert.equal(tier(80).title, 'পাক্কা নব্বইয়ের পোলাপান');
+  assert.equal(tier(81).title, 'বিটিভির লোগো তুমি নিজেই');
+  assert.equal(tier(100).title, 'বিটিভির লোগো তুমি নিজেই');
 });
 
 import { packChallenge, unpackChallenge } from '../src/score.js';
@@ -47,10 +47,10 @@ test('the sender name is cut to 20 characters', () => {
 
 import { compare } from '../src/score.js';
 
-test('compare splits memories into both, only me and only them', () => {
+test('compare splits memories into both-remember and only-them', () => {
   const me = [true, true, false, false];
   const them = [true, false, true, false];
-  assert.deepEqual(compare(me, them), { both: [0], onlyMe: [1], onlyThem: [2] });
+  assert.deepEqual(compare(me, them), { both: [0], onlyThem: [2] });
 });
 
 import { bn } from '../src/score.js';

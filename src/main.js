@@ -56,7 +56,6 @@ function replay(el, cls) {
   el.classList.add(cls);
 }
 
-const RANGES = ['০–২৫%', '২৬–৫০%', '৫১–৮০%', '৮১%+'];
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const result = document.getElementById('result');
 const scoreEl = result.querySelector('[data-testid="score"]');
@@ -114,12 +113,12 @@ function renderVersus(pct) {
 
 function renderResult() {
   const pct = percent(ticked.size, TOTAL);
-  const t = TIERS.find((x) => x.title === tier(pct));
+  const t = tier(pct);
   result.querySelector('.result-count').textContent = `${bn(TOTAL)}টার মধ্যে ${bn(ticked.size)}টা চিনছো`;
   result.querySelector('.rank').textContent = `${t.title} ${t.emoji}`;
   result.querySelector('.remark').textContent = remark(pct, TOTAL - ticked.size);
-  document.getElementById('scheme').innerHTML = TIERS.map((x, i) =>
-    `<tr${x === t ? ' class="you"' : ''}><td>${RANGES[i]}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
+  document.getElementById('scheme').innerHTML = TIERS.map((x) =>
+    `<tr${x === t ? ' class="you"' : ''}><td>${x.range}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
   renderVersus(pct);
   if (revealed) {
     scoreEl.textContent = bn(pct) + '%';

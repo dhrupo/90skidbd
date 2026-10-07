@@ -1,13 +1,13 @@
 export const TIERS = [
-  { max: 25, title: '২০০০-এর পরের বাচ্চা', emoji: '🍼' },
-  { max: 50, title: 'আধা নব্বই, আধা ইউটিউব', emoji: '📱' },
-  { max: 80, title: 'পাক্কা নব্বইয়ের পোলাপান', emoji: '🎒' },
-  { max: 100, title: 'বিটিভির লোগো তুমি নিজেই', emoji: '📺' },
+  { max: 25, range: '০–২৫%', title: '২০০০-এর পরের বাচ্চা', emoji: '🍼' },
+  { max: 50, range: '২৬–৫০%', title: 'আধা নব্বই, আধা ইউটিউব', emoji: '📱' },
+  { max: 80, range: '৫১–৮০%', title: 'পাক্কা নব্বইয়ের পোলাপান', emoji: '🎒' },
+  { max: 100, range: '৮১%+', title: 'বিটিভির লোগো তুমি নিজেই', emoji: '📺' },
 ];
 
 export const percent = (ticked, total) => Math.round((ticked / total) * 100);
 
-export const tier = (pct) => TIERS.find((t) => pct <= t.max).title;
+export const tier = (pct) => TIERS.find((t) => pct <= t.max);
 
 const NAME_MAX = 20;
 const cutName = (name) => Array.from((name || '').trim()).slice(0, NAME_MAX).join('');
@@ -30,11 +30,10 @@ export function unpackChallenge(hash, total = 48) {
 }
 
 export function compare(me, them) {
-  const out = { both: [], onlyMe: [], onlyThem: [] };
+  const out = { both: [], onlyThem: [] };
   me.forEach((mine, i) => {
     if (mine && them[i]) out.both.push(i);
-    else if (mine) out.onlyMe.push(i);
-    else if (them[i]) out.onlyThem.push(i);
+    else if (!mine && them[i]) out.onlyThem.push(i);
   });
   return out;
 }

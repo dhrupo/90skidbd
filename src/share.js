@@ -1,5 +1,5 @@
 import { CHAPTERS, ITEMS } from './items.js';
-import { bn, percent, tier, TIERS } from './score.js';
+import { bn, percent, tier } from './score.js';
 
 const W = 1080;
 const H = 1350;
@@ -39,7 +39,7 @@ export async function drawShare(ticked) {
   for (let y = 48; y < H; y += 48) ctx.fillRect(0, y, W, 2);
 
   const pct = percent(ticked.size, ITEMS.length);
-  const t = TIERS.find((x) => x.title === tier(pct));
+  const t = tier(pct);
 
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = C.ink;
