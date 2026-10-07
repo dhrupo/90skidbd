@@ -60,3 +60,18 @@ test('numbers are written in Bangla digits', () => {
   assert.equal(bn(48), '৪৮');
   assert.equal(bn('৩২/48'), '৩২/৪৮');
 });
+
+test('a link made with 48 items still works after items are added', () => {
+  const old = packChallenge(sample, 'রাফি');
+  const now = unpackChallenge(old, 56);
+  assert.deepEqual(now.ticks, [...sample, ...Array(8).fill(false)]);
+  assert.equal(now.name, 'রাফি');
+});
+
+test('a link longer than today\'s list is rejected', () => {
+  assert.equal(unpackChallenge(packChallenge(Array(56).fill(true), ''), 48), null);
+});
+
+test('hidden direction-flipping characters are stripped from names', () => {
+  assert.equal(unpackChallenge(packChallenge(sample, 'রা‮ফি⁦')).name, 'রাফি');
+});

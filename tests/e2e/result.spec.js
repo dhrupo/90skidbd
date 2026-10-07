@@ -23,3 +23,13 @@ test('with nothing ticked the result asks you to tick first', async ({ page }) =
   await result.scrollIntoViewIfNeeded();
   await expect(result.getByTestId('remark')).toContainText('আগে');
 });
+
+test('ticking during the score count-up still ends on the new score', async ({ page }) => {
+  await page.goto('/');
+  await tick(page, 24);
+  await page.locator('#result').scrollIntoViewIfNeeded();
+  await expect(page.locator('#result')).toHaveClass(/reveal/);
+  await page.locator('.card').nth(24).evaluate((el) => el.click());
+  await page.waitForTimeout(1200);
+  await expect(page.getByTestId('score')).toHaveText('৫২%');
+});

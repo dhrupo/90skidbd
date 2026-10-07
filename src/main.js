@@ -5,11 +5,23 @@ import { drawShare, shareImage } from './share.js';
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
 const ticked = new Set(load());
-const challenger = unpackChallenge(location.hash, TOTAL);
+const CHALLENGE = '90skid-challenge';
+const challenger = unpackChallenge(location.hash, TOTAL) || unpackChallenge(sessionGet(CHALLENGE), TOTAL);
+if (challenger && location.hash.startsWith('#c=')) sessionSet(CHALLENGE, location.hash);
 const theirName = challenger?.name || 'তোমার বন্ধু';
 
+function sessionGet(key) {
+  try { return sessionStorage.getItem(key); } catch { return null; }
+}
+function sessionSet(key, value) {
+  try { sessionStorage.setItem(key, value); } catch { /* storage blocked: challenge just won't survive a reload */ }
+}
+
 function load() {
-  try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    return Array.isArray(saved) ? ITEMS.map((it) => it.id).filter((id) => saved.includes(id)) : [];
+  } catch { return []; }
 }
 function save() {
   try { localStorage.setItem(STORE, JSON.stringify([...ticked])); } catch { /* private mode: ticks just won't persist */ }
@@ -71,12 +83,13 @@ function remark(pct, missed) {
   return `${bn(missed)}টা মিস? চলো মাফ করলাম, বিটিভির লোগো বলে কথা!` + sign;
 }
 
-function countUp(to) {
-  if (reduceMotion()) { scoreEl.textContent = bn(to) + '%'; return; }
+function countUp() {
+  const target = () => percent(ticked.size, TOTAL);
+  if (reduceMotion()) { scoreEl.textContent = bn(target()) + '%'; return; }
   const start = performance.now();
   const step = (now) => {
     const t = Math.min(1, (now - start) / 900);
-    scoreEl.textContent = bn(Math.round(to * (1 - (1 - t) ** 3))) + '%';
+    scoreEl.textContent = bn(Math.round(target() * (1 - (1 - t) ** 3))) + '%';
     if (t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -149,7 +162,8 @@ function schedulePreview() {
 shareBtn.addEventListener('click', async () => {
   shareBtn.setAttribute('aria-busy', 'true');
   try {
-    await shareImage(shareBlob || await drawShare(new Set(ticked)));
+    const how = await shareImage(shareBlob || await drawShare(new Set(ticked)));
+    if (how === 'downloaded') toast('ছবি সেভ হইছে। না হলে উপরের ছবিটা চেপে ধরে সেভ করো 👆');
   } catch {
     toast('শেয়ার হইল না 😕 আবার চাপো তো');
   } finally {
@@ -185,7 +199,7 @@ new IntersectionObserver(([entry], obs) => {
   revealed = true;
   updatePreview();
   result.classList.add('reveal');
-  countUp(percent(ticked.size, TOTAL));
+  countUp();
   obs.disconnect();
 }, { threshold: 0.4 }).observe(result);
 

@@ -48,3 +48,11 @@ test('a broken challenge link just starts a normal game', async ({ page }) => {
   await page.locator('.card').first().click();
   await expect(page.getByTestId('counter')).toHaveText('১/৪৮');
 });
+
+test('the challenge survives tapping the intro button and reloading', async ({ page }) => {
+  await page.goto('/' + packChallenge(firstN(36), 'রাফি'));
+  await page.getByRole('link', { name: /আচ্ছা, দেখি তো/ }).click();
+  await expect(page).not.toHaveURL(/#c=/);
+  await page.reload();
+  await expect(page.getByTestId('challenge-banner')).toContainText('রাফি তোমাকে চ্যালেঞ্জ');
+});

@@ -26,3 +26,19 @@ test('ticks survive a page reload', async ({ page }) => {
   await expect(card(page, 'লুডুতে ঝগড়া')).toHaveAttribute('aria-pressed', 'true');
   await expect(counter(page)).toHaveText('২/৪৮');
 });
+
+for (const [label, saved] of [
+  ['an id that no longer exists', JSON.stringify(['alif-laila', 'removed-item', 'meena'])],
+  ['more ids than items', JSON.stringify([...Array(49)].map((_, i) => 'x' + i).concat('mimi'))],
+  ['a number', '5'],
+  ['an object', '{}'],
+]) {
+  test(`bad saved ticks (${label}) never break the page`, async ({ page }) => {
+    await page.addInitScript((v) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('90skid-ticks', v); sessionStorage.setItem('seeded', '1'); } }, saved);
+    await page.goto('/');
+    await expect(page.locator('#chapters .card')).toHaveCount(48);
+    const pressed = await page.locator('#chapters .card[aria-pressed="true"]').count();
+    await expect(page.getByTestId('counter')).toHaveText(`${'০১২৩'[pressed]}/৪৮`);
+    await expect(page.locator('#result')).toBeVisible();
+  });
+}

@@ -10,7 +10,9 @@ export const percent = (ticked, total) => Math.round((ticked / total) * 100);
 export const tier = (pct) => TIERS.find((t) => pct <= t.max);
 
 const NAME_MAX = 20;
-const cutName = (name) => Array.from((name || '').trim()).slice(0, NAME_MAX).join('');
+const LAUNCH_ITEMS = 48;
+const codeLength = (items) => Math.ceil(Math.ceil(items / 8) * 4 / 3);
+const cutName = (name) => Array.from((name || '').replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '').trim()).slice(0, NAME_MAX).join('');
 
 export function packChallenge(ticks, name) {
   const bytes = new Uint8Array(Math.ceil(ticks.length / 8));
@@ -23,7 +25,8 @@ export function packChallenge(ticks, name) {
 export function unpackChallenge(hash, total = 48) {
   const params = new URLSearchParams((hash || '').replace(/^#/, ''));
   const code = params.get('c') || '';
-  if (!/^[A-Za-z0-9_-]+$/.test(code) || code.length !== Math.ceil(Math.ceil(total / 8) * 4 / 3)) return null;
+  if (!/^[A-Za-z0-9_-]+$/.test(code) || code.length % 4 === 1) return null;
+  if (code.length < codeLength(LAUNCH_ITEMS) || code.length > codeLength(total)) return null;
   const raw = atob(code.replace(/-/g, '+').replace(/_/g, '/'));
   const ticks = Array.from({ length: total }, (_, i) => (raw.charCodeAt(i >> 3) & (128 >> (i & 7))) !== 0);
   return { ticks, name: cutName(params.get('n')) };

@@ -34,6 +34,7 @@ test('without a share sheet the PNG downloads instead', async ({ page }) => {
     page.getByRole('button', { name: /পোস্ট মারো/ }).click(),
   ]);
   expect(download.suggestedFilename()).toMatch(/\.png$/);
+  await expect(page.getByRole('status')).toContainText('চেপে ধরে');
   expect(pngSize(fs.readFileSync(await download.path()))).toEqual({ w: 1080, h: 1350 });
 });
 
@@ -42,5 +43,13 @@ test('the result shows a preview of the share image', async ({ page }) => {
   await tickAndReveal(page, 3);
   const preview = page.getByRole('img', { name: /শেয়ার ছবি/ });
   await expect(preview).toBeVisible();
+  await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
+});
+
+test('older phones without canvas roundRect still get a share image', async ({ page }) => {
+  await page.addInitScript(() => { delete CanvasRenderingContext2D.prototype.roundRect; });
+  await page.goto('/');
+  await tickAndReveal(page, 3);
+  const preview = page.getByRole('img', { name: /শেয়ার ছবি/ });
   await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
 });

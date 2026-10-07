@@ -53,7 +53,8 @@ export async function drawShare(ticked) {
   ctx.strokeStyle = C.red;
   ctx.lineWidth = 6;
   ctx.beginPath();
-  ctx.roundRect(pill.x, pill.y, pill.w, pill.h, 56);
+  if (ctx.roundRect) ctx.roundRect(pill.x, pill.y, pill.w, pill.h, 56);
+  else ctx.rect(pill.x, pill.y, pill.w, pill.h);
   ctx.stroke();
   ctx.fillStyle = C.red;
   ctx.font = '800 68px "Baloo Da 2"';
@@ -104,11 +105,12 @@ export async function shareImage(blob) {
     } catch (e) {
       if (e.name !== 'AbortError') throw e;
     }
-    return;
+    return 'shared';
   }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = file.name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  return 'downloaded';
 }

@@ -7,7 +7,7 @@ export const CHAPTERS = [
   { id: 'eid', chip: '🌙 ঈদ', title: 'সালামি সিজন 🌙', aside: 'সালামির টাকা আম্মুর কাছে “জমা” থাকত।', done: 'পুরা অধ্যায় শেষ! সালামি কালেক্টর লেভেল: প্রো 🌙' },
 ];
 
-// Order is part of every challenge link: append new items only, never reorder.
+// Order is part of every challenge link: append new items only, never reorder or remove.
 export const ITEMS = [
   ['tv', 'alif-laila', 'আলিফ লায়লা দেখতে দৌড়ে বাসায়'],
   ['tv', 'meena', 'মীনা, রাজু আর মিঠু'],
