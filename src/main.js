@@ -71,7 +71,9 @@ function replay(el, cls) {
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const result = document.getElementById('result');
 const scoreEl = result.querySelector('[data-testid="score"]');
-let revealed = false;
+const bar = document.querySelector('[data-testid="submit-bar"]');
+const submitBtn = document.getElementById('submit-btn');
+let closedOnce = false;
 
 function remark(pct, missed) {
   const sign = ' — ক্লাস টিচার';
@@ -133,30 +135,36 @@ function renderResult() {
   document.getElementById('scheme').innerHTML = TIERS.map((x) =>
     `<tr${x === t ? ' class="you"' : ''}><td>${x.range}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
   renderVersus(pct);
-  if (revealed) {
-    scoreEl.textContent = bn(pct) + '%';
-    schedulePreview();
-  }
+}
+
+function possessive(name) {
+  if (/^[\u0980-\u09FF]/.test(name)) return name + (/[\u0985-\u0994\u09BE-\u09CC]$/.test(name) ? 'র' : 'ের');
+  return name + '-এর';
+}
+
+function renderBar() {
+  bar.hidden = ticked.size === 0;
+  bar.querySelector('.submit-count').textContent = bn(`${ticked.size}/${TOTAL}`);
+  if (closedOnce) submitBtn.textContent = 'আবার দেখি 🔁';
+  else if (challenger) submitBtn.textContent = `${challenger.name ? possessive(challenger.name) : 'বন্ধুর'} সাথে মিলাও 🥊`;
+  else submitBtn.textContent = 'রেজাল্ট দেখাও 📝';
 }
 
 const preview = document.querySelector('.share-preview');
 const shareBtn = document.getElementById('share-btn');
 let shareBlob = null;
-let previewTimer;
+let drawing = 0;
 
 async function updatePreview() {
+  const mine = ++drawing;
+  shareBlob = null;
   const blob = await drawShare(new Set(ticked));
+  if (mine !== drawing) return;
   shareBlob = blob;
   const old = preview.src;
   preview.src = URL.createObjectURL(blob);
   preview.hidden = false;
   if (old) URL.revokeObjectURL(old);
-}
-
-function schedulePreview() {
-  shareBlob = null;
-  clearTimeout(previewTimer);
-  previewTimer = setTimeout(updatePreview, 300);
 }
 
 shareBtn.addEventListener('click', async () => {
@@ -194,14 +202,25 @@ document.getElementById('challenge').addEventListener('submit', async (e) => {
   }, 2500);
 });
 
-new IntersectionObserver(([entry], obs) => {
-  if (!entry.isIntersecting) return;
-  revealed = true;
-  updatePreview();
-  result.classList.add('reveal');
+submitBtn.addEventListener('click', () => {
+  renderResult();
+  result.showModal();
+  result.append(toastEl);
+  history.pushState({ result: true }, '');
+  replay(result, 'reveal');
   countUp();
-  obs.disconnect();
-}, { threshold: 0.4 }).observe(result);
+  updatePreview();
+});
+
+result.addEventListener('close', () => {
+  document.body.append(toastEl);
+  closedOnce = true;
+  renderBar();
+  if (history.state?.result) history.back();
+});
+document.getElementById('close-btn').addEventListener('click', () => result.close());
+result.addEventListener('click', (e) => { if (e.target === result) result.close(); });
+addEventListener('popstate', () => { if (result.open) result.close(); });
 
 const chapterDone = (c) => ITEMS.every((it) => it.chapter !== c.id || ticked.has(it.id));
 
@@ -218,7 +237,7 @@ function render() {
     document.getElementById(`ch-${c.id}`).classList.toggle('done', done);
     document.querySelector(`[data-chip="${c.id}"]`).classList.toggle('done', done);
   }
-  renderResult();
+  renderBar();
 }
 
 document.getElementById('chapters').addEventListener('click', (e) => {
@@ -254,4 +273,4 @@ document.getElementById('chapters').addEventListener('click', (e) => {
 });
 
 render();
-document.querySelectorAll('#result, .footer').forEach((el) => { el.hidden = false; });
+document.querySelector('.footer').hidden = false;

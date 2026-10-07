@@ -39,6 +39,6 @@ for (const [label, saved] of [
     await expect(page.locator('#chapters .card')).toHaveCount(48);
     const pressed = await page.locator('#chapters .card[aria-pressed="true"]').count();
     await expect(page.getByTestId('counter')).toHaveText(`${'০১২৩'[pressed]}/৪৮`);
-    await expect(page.locator('#result')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 }

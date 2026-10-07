@@ -53,8 +53,16 @@
     </nav>
 
     <div id="chapters"></div>
+  </main>
 
-    <section class="result" id="result" aria-labelledby="h-result" hidden>
+  <div class="submit-bar" data-testid="submit-bar" hidden>
+    <span class="submit-count"></span>
+    <button type="button" class="btn btn-blue" id="submit-btn"></button>
+  </div>
+
+  <dialog class="result" id="result" aria-labelledby="h-result">
+    <div class="sheet">
+      <button type="button" class="close" id="close-btn" aria-label="বন্ধ করো">✕</button>
       <p class="chapter-kicker">শেষ পাতা</p>
       <h2 id="h-result">রেজাল্ট বের হইছে! <span aria-hidden="true">📝</span></h2>
       <div class="result-card">
@@ -70,10 +78,10 @@
         </div>
         <p class="remark" data-testid="remark"></p>
         <div class="versus" data-testid="versus" hidden></div>
-        <table class="scheme">
-          <caption>মার্কিং স্কিম</caption>
-          <tbody id="scheme"></tbody>
-        </table>
+        <details class="scheme-fold">
+          <summary>মার্কিং স্কিম</summary>
+          <table class="scheme"><tbody id="scheme"></tbody></table>
+        </details>
       </div>
 
       <div class="share">
@@ -94,8 +102,8 @@
         <input id="sender" name="sender" maxlength="20" autocomplete="given-name" placeholder="না দিলেও চলবে">
         <button type="submit" class="btn btn-red" id="challenge-btn">দেখি ও কয়টা পারে <span aria-hidden="true">🥊</span></button>
       </form>
-    </section>
-  </main>
+    </div>
+  </dialog>
 
   <footer class="footer" hidden>
     <p>কোনো ছবি তোমার? সরাতে চাইলে <a href="mailto:hello@90skidbd.com">hello@90skidbd.com</a>-এ একটা মেইল দিও, সরিয়ে দিব।</p>

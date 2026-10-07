@@ -6,7 +6,7 @@ const pngSize = (buf) => ({ w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) });
 async function tickAndReveal(page, n) {
   const cards = page.locator('.card');
   for (let i = 0; i < n; i++) await cards.nth(i).click();
-  await page.locator('#result').scrollIntoViewIfNeeded();
+  await page.getByTestId('submit-bar').getByRole('button').click();
 }
 
 test('share sheet receives a 1080x1350 PNG of the result', async ({ page }) => {

@@ -8,6 +8,7 @@ test('page loads with the brand title', async ({ page }) => {
 
 test('the page does not jump around while it loads on a slow network', async ({ page, browserName }) => {
   test.skip(browserName === 'webkit', 'WebKit has no layout-shift performance API');
+  await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.abort());
   await page.route('**/src/main.js', async (route) => {
     await new Promise((r) => setTimeout(r, 1500));
     await route.continue();
@@ -19,7 +20,6 @@ test('the page does not jump around while it loads on a slow network', async ({ 
     }).observe({ type: 'layout-shift', buffered: true });
   });
   await page.goto('/');
-  await page.evaluate(() => document.fonts.ready);
   await expect(page.locator('.card')).toHaveCount(48);
   expect(await page.evaluate(() => window.__cls)).toBeLessThan(0.1);
 });

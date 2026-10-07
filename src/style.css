@@ -220,7 +220,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   z-index: 20;
   max-width: calc(100% - 32px);
   padding: 10px 16px;
@@ -235,8 +235,60 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-.result { padding-top: 56px; }
-.result h2 { font-size: 24px; }
+.submit-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-deep);
+  border-top: 1px solid #2B21181F;
+  box-shadow: 0 -6px 16px -10px #2B211866;
+  animation: fade-up .2s ease-out;
+}
+.submit-count { flex: none; font: 800 20px/1 var(--display); color: var(--green); font-variant-numeric: tabular-nums; }
+.submit-bar .btn { min-height: 48px; }
+
+.result {
+  width: calc(100% - 24px);
+  max-width: 456px;
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  background:
+    repeating-linear-gradient(transparent 0 calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px) var(--line)),
+    var(--paper);
+  box-shadow: 0 24px 48px -12px #2B2118AA;
+  overscroll-behavior: contain;
+}
+.result::backdrop { background: #2B2118B3; }
+.result[open] { animation: pop-in .26s var(--spring); }
+.sheet { position: relative; padding: 20px 20px 28px; }
+.result h2 { font-size: 24px; padding-right: 48px; }
+.close {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font: 700 18px var(--body);
+  cursor: pointer;
+  box-shadow: 0 1px 3px #2B211840;
+}
+.scheme-fold { margin-top: 16px; }
+.scheme-fold summary { min-height: 44px; display: flex; align-items: center; font: 700 14px var(--body); color: var(--muted); cursor: pointer; }
 .result-card {
   margin-top: 16px;
   padding: 20px;
@@ -251,8 +303,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .result-count { margin: 0; font-size: 14px; color: var(--muted); }
 .rank { margin: 2px 0 0; font: 800 22px/1.25 var(--display); }
 .remark { margin: 16px 0 0; padding-top: 14px; border-top: 1.5px solid #9FB9D1; font: 400 15px/1.5 var(--hand); color: var(--red); min-height: 3em; }
-.scheme { width: 100%; margin-top: 16px; border-collapse: collapse; }
-.scheme caption { text-align: left; font: 700 13px var(--body); color: var(--muted); padding-bottom: 6px; }
+.scheme { width: 100%; border-collapse: collapse; }
 .scheme td { padding: 8px; font: 400 15px var(--hand); border-top: 1px dashed #2B21181F; }
 .scheme td:first-child { font: 800 14px var(--display); color: var(--muted); white-space: nowrap; }
 .scheme tr.you td { color: var(--green); background: #1E7B3414; border: 1.5px solid var(--green); border-width: 1.5px 0; }
@@ -314,7 +365,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .btn-red { margin-top: 4px; background: var(--card); color: var(--red); border: 2px solid var(--red); box-shadow: 3px 3px 0 var(--red); }
 .btn-red.copied { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
 
-.footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
+.footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(96px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
 .footer p { margin: 0; }
 .footer a { color: var(--blue); overflow-wrap: anywhere; }
 .footer .credit { margin-top: 10px; font-size: 11px; color: var(--muted); }
@@ -337,6 +388,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 }
 @keyframes roll-up { from { opacity: 0; transform: translateY(60%); } to { opacity: 1; transform: none; } }
 @keyframes glow { 50% { box-shadow: 0 0 0 3px #1E7B3440; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(24px) scale(.98); } }
 @keyframes draw { from { stroke-dashoffset: 100; } }
 @keyframes stamp { from { transform: scale(1.6) rotate(-14deg); } to { transform: rotate(-4deg); } }
 

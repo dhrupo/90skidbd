@@ -10,6 +10,7 @@ test('sender gets a challenge link carrying their ticks and name', async ({ page
   await page.goto('/');
   const cards = page.locator('.card');
   for (let i = 0; i < 3; i++) await cards.nth(i).click();
+  await page.getByTestId('submit-bar').getByRole('button').click();
   await page.getByLabel('তোমার নাম').fill('রাফি');
   await page.getByRole('button', { name: /দেখি ও কয়টা পারে/ }).click();
   await expect.poll(() => page.evaluate(() => window.__url)).toContain('#c=');
@@ -22,8 +23,8 @@ test('receiver plays, then sees how they compare with the sender', async ({ page
   await expect(page.getByTestId('challenge-banner')).toContainText('রাফি তোমাকে চ্যালেঞ্জ');
   const cards = page.locator('.card');
   for (let i = 0; i < 30; i++) await cards.nth(i).click();
+  await page.getByTestId('submit-bar').getByRole('button').click();
   const vs = page.getByTestId('versus');
-  await vs.scrollIntoViewIfNeeded();
   await expect(vs).toContainText('তুমি ৬৩%');
   await expect(vs).toContainText('রাফি ৭৫%');
   await expect(vs).toContainText('দুজনেরই মনে আছে ৩০টা');
@@ -37,7 +38,8 @@ test('a booby-trapped name is shown as plain text and never runs', async ({ page
   await expect(banner).toContainText('<img src=x');
   await expect(banner.locator('img')).toHaveCount(0);
   await page.locator('.card').first().click();
-  await page.locator('#result').scrollIntoViewIfNeeded();
+  await page.getByTestId('submit-bar').getByRole('button').click();
+  await expect(page.getByTestId('versus')).toBeVisible();
   await expect(page.getByTestId('versus').locator('img')).toHaveCount(0);
   expect(await page.evaluate(() => window.__pwned)).toBeUndefined();
 });
