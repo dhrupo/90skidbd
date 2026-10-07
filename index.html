@@ -23,6 +23,8 @@
   </header>
 
   <main id="top" class="page">
+    <p class="challenge-banner" data-testid="challenge-banner" hidden></p>
+
     <section class="intro">
       <div class="label-card">
         <p><span>নাম:</span> <b>নব্বইয়ের শিশু</b></p>
@@ -58,6 +60,7 @@
           </div>
         </div>
         <p class="remark" data-testid="remark"></p>
+        <div class="versus" data-testid="versus" hidden></div>
         <table class="scheme">
           <caption>মার্কিং স্কিম</caption>
           <tbody id="scheme"></tbody>
@@ -75,6 +78,13 @@
           ছবিটা পোস্ট মারো
         </button>
       </div>
+
+      <form class="challenge" id="challenge">
+        <h3>বন্ধুকে একটু খোঁচা দাও <span aria-hidden="true">😈</span></h3>
+        <label for="sender">তোমার নাম</label>
+        <input id="sender" name="sender" maxlength="20" autocomplete="given-name" placeholder="না দিলেও চলবে">
+        <button type="submit" class="btn btn-red" id="challenge-btn">দেখি ও কয়টা পারে <span aria-hidden="true">🥊</span></button>
+      </form>
     </section>
   </main>
 

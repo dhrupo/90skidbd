@@ -1,10 +1,12 @@
 import { CHAPTERS, ITEMS } from './items.js';
-import { bn, percent, tier, TIERS } from './score.js';
+import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } from './score.js';
 import { drawShare, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
 const ticked = new Set(load());
+const challenger = unpackChallenge(location.hash, TOTAL);
+const theirName = challenger?.name || 'তোমার বন্ধু';
 
 function load() {
   try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; }
@@ -81,6 +83,35 @@ function countUp(to) {
   requestAnimationFrame(step);
 }
 
+if (challenger) {
+  const banner = document.querySelector('[data-testid="challenge-banner"]');
+  banner.textContent = `${theirName} তোমাকে চ্যালেঞ্জ করছে 🥊 আগে নিজে খেলো, শেষে দেখবা কে জিতল।`;
+  banner.hidden = false;
+}
+
+function renderVersus(pct) {
+  const box = document.querySelector('[data-testid="versus"]');
+  if (!challenger || ticked.size === 0) { box.hidden = true; return; }
+  const mine = ITEMS.map((it) => ticked.has(it.id));
+  const { both, onlyThem } = compare(mine, challenger.ticks);
+  const theirs = percent(challenger.ticks.filter(Boolean).length, TOTAL);
+  const face = pct > theirs ? '😎' : pct < theirs ? '😤' : '🤝';
+  const lines = [
+    `তুমি ${bn(pct)}%, ${theirName} ${bn(theirs)}% ${face}`,
+    `দুজনেরই মনে আছে ${bn(both.length)}টা`,
+  ];
+  if (onlyThem.length) {
+    const missed = onlyThem.slice(0, 3).map((i) => ITEMS[i].caption).join(', ');
+    lines.push(`${theirName} মনে রাখছে কিন্তু তুমি ভুলে গেছ: ${missed}${onlyThem.length > 3 ? '…' : ''}`);
+  }
+  box.replaceChildren(...lines.map((text, i) => {
+    const el = document.createElement(i === 0 ? 'strong' : 'p');
+    el.textContent = text;
+    return el;
+  }));
+  box.hidden = false;
+}
+
 function renderResult() {
   const pct = percent(ticked.size, TOTAL);
   const t = TIERS.find((x) => x.title === tier(pct));
@@ -89,6 +120,7 @@ function renderResult() {
   result.querySelector('.remark').textContent = remark(pct, TOTAL - ticked.size);
   document.getElementById('scheme').innerHTML = TIERS.map((x, i) =>
     `<tr${x === t ? ' class="you"' : ''}><td>${RANGES[i]}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
+  renderVersus(pct);
   if (revealed) {
     scoreEl.textContent = bn(pct) + '%';
     schedulePreview();
@@ -123,6 +155,29 @@ shareBtn.addEventListener('click', async () => {
   } finally {
     shareBtn.removeAttribute('aria-busy');
   }
+});
+
+const challengeBtn = document.getElementById('challenge-btn');
+document.getElementById('challenge').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('sender').value;
+  const url = location.origin + location.pathname + packChallenge(ITEMS.map((it) => ticked.has(it.id)), name);
+  const text = `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
+  try {
+    if (navigator.share) await navigator.share({ url, text });
+    else await navigator.clipboard.writeText(`${text} ${url}`);
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    toast('লিংক কপি হইল না 😕 আবার চাপো তো');
+    return;
+  }
+  challengeBtn.classList.add('copied');
+  challengeBtn.textContent = 'লিংক রেডি ✓';
+  toast('এবার বন্ধুর ইনবক্সে ছুঁড়ে মারো 😈');
+  setTimeout(() => {
+    challengeBtn.classList.remove('copied');
+    challengeBtn.innerHTML = 'দেখি ও কয়টা পারে <span aria-hidden="true">🥊</span>';
+  }, 2500);
 });
 
 new IntersectionObserver(([entry], obs) => {
