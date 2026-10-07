@@ -59,3 +59,37 @@ for (const [how, close] of [
     await expect(bar(page).getByRole('button')).toHaveText(/আবার দেখি/);
   });
 }
+
+import { packChallenge } from '../../src/score.js';
+
+for (const [name, label] of [
+  ['রাফি', 'রাফির সাথে মিলাও'],
+  ['রহিম', 'রহিমের সাথে মিলাও'],
+  ['Rafi', 'Rafi-এর সাথে মিলাও'],
+  ['', 'বন্ধুর সাথে মিলাও'],
+]) {
+  test(`a challenge from "${name || 'no name'}" labels the button "${label}"`, async ({ page }) => {
+    await page.goto('/' + packChallenge(Array(48).fill(true), name));
+    await page.locator('.card').first().click();
+    await expect(bar(page).getByRole('button')).toHaveText(new RegExp(label));
+  });
+}
+
+test('the marking scheme stays folded until tapped', async ({ page }) => {
+  await page.goto('/');
+  await tick(page, 1);
+  await bar(page).getByRole('button').click();
+  const scheme = dialogOf(page).locator('table.scheme');
+  await expect(scheme).toBeHidden();
+  await dialogOf(page).getByText('মার্কিং স্কিম').click();
+  await expect(scheme).toBeVisible();
+});
+
+test('with reduce-motion the pop-up shows the final score at once', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await tick(page, 12);
+  await bar(page).getByRole('button').click();
+  await expect(dialogOf(page).getByTestId('score')).toHaveText('২৫%', { timeout: 200 });
+  expect(await dialogOf(page).evaluate((d) => getComputedStyle(d).animationName)).toBe('none');
+});
