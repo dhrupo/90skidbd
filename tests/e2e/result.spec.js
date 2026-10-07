@@ -30,6 +30,7 @@ test('ticking during the score count-up still ends on the new score', async ({ p
   await page.locator('#result').scrollIntoViewIfNeeded();
   await expect(page.locator('#result')).toHaveClass(/reveal/);
   await page.locator('.card').nth(24).evaluate((el) => el.click());
+  // JUSTIFIED: wait past the 900ms count-up so a stale final frame would be caught
   await page.waitForTimeout(1200);
   await expect(page.getByTestId('score')).toHaveText('৫২%');
 });
