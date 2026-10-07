@@ -137,6 +137,7 @@ async function updatePreview() {
   shareBlob = blob;
   const old = preview.src;
   preview.src = URL.createObjectURL(blob);
+  preview.hidden = false;
   if (old) URL.revokeObjectURL(old);
 }
 
@@ -240,3 +241,4 @@ document.getElementById('chapters').addEventListener('click', (e) => {
 });
 
 render();
+document.querySelectorAll('#result, .footer').forEach((el) => { el.hidden = false; });

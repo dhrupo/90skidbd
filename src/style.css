@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
@@ -58,10 +59,10 @@ body {
 .brand { font: 800 19px/1 var(--display); color: var(--ink); text-decoration: none; }
 
 .meter { display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 6px; justify-items: end; }
-.meter-label { font: 500 12px var(--body); color: var(--muted); }
+.meter-label { font: 400 12px var(--body); color: var(--muted); }
 .meter-value { font: 800 20px/1 var(--display); color: var(--green); font-variant-numeric: tabular-nums; }
 .meter-bar { grid-column: 1 / -1; width: 112px; height: 6px; margin-top: 4px; border-radius: 3px; background: #2B21181F; overflow: hidden; }
-.meter-bar i { display: block; height: 100%; width: calc(var(--p, 0) * 1%); background: var(--green); border-radius: inherit; transition: width .28s ease-out; }
+.meter-bar i { display: block; height: 100%; background: var(--green); transform: scaleX(calc(var(--p, 0) / 100)); transform-origin: left; transition: transform .28s ease-out; }
 
 h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.25; margin: 0; }
 h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
@@ -83,7 +84,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 
 .sticker {
   position: absolute;
-  right: -34px;
+  right: -14px;
   top: 18px;
   width: 78px;
   height: 78px;
@@ -96,7 +97,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   transform: rotate(12deg);
   box-shadow: 0 2px 4px #2B211833;
 }
-.sticker strong { display: block; font: 800 15px/1.1 var(--display); color: var(--red); }
+.sticker strong { display: block; font: 800 15px/1.1 var(--display); color: #8E1710; }
 
 .lede { color: var(--muted); margin: 12px 0 8px; }
 .margin-note { font: 400 15px var(--hand); color: var(--blue); margin: 0 0 20px; }
@@ -142,7 +143,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 }
 .toc a small { font-size: 12px; font-weight: 400; color: var(--muted); }
 .toc a.done { background: var(--green); border-color: var(--green); color: #fff; }
-.toc a.done small { color: #ffffffb3; }
+.toc a.done small { color: #fff; }
 
 .chapter { padding-top: 40px; }
 .chapter-kicker { font: 400 15px var(--hand); color: var(--red); margin: 0; }
@@ -253,7 +254,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .scheme { width: 100%; margin-top: 16px; border-collapse: collapse; }
 .scheme caption { text-align: left; font: 700 13px var(--body); color: var(--muted); padding-bottom: 6px; }
 .scheme td { padding: 8px; font: 400 15px var(--hand); border-top: 1px dashed #2B21181F; }
-.scheme td:first-child { font: 700 14px var(--display); color: var(--muted); white-space: nowrap; }
+.scheme td:first-child { font: 800 14px var(--display); color: var(--muted); white-space: nowrap; }
 .scheme tr.you td { color: var(--green); background: #1E7B3414; border: 1.5px solid var(--green); border-width: 1.5px 0; }
 .scheme tr.you td:first-child { border-left-width: 1.5px; color: var(--green); }
 .scheme tr.you td:last-child { border-right-width: 1.5px; }
@@ -299,7 +300,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 
 .challenge { margin-top: 40px; display: grid; gap: 8px; }
 .challenge h3 { font: 700 15px var(--body); }
-.challenge label { font: 500 13px var(--body); color: var(--muted); }
+.challenge label { font: 400 13px var(--body); color: var(--muted); }
 .challenge input {
   min-height: 52px;
   padding: 12px 14px;
@@ -309,14 +310,14 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   color: var(--ink);
   font: 400 16px var(--body);
 }
-.challenge input::placeholder { color: #6A584199; }
+.challenge input::placeholder { color: var(--muted); }
 .btn-red { margin-top: 4px; background: var(--card); color: var(--red); border: 2px solid var(--red); box-shadow: 3px 3px 0 var(--red); }
 .btn-red.copied { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
 
 .footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
 .footer p { margin: 0; }
 .footer a { color: var(--blue); overflow-wrap: anywhere; }
-.footer .credit { margin-top: 10px; font-size: 11px; color: #6A5841B3; }
+.footer .credit { margin-top: 10px; font-size: 11px; color: var(--muted); }
 
 .card[aria-pressed="true"] .tick { animation: tick-in .32s var(--spring) both; }
 .card[aria-pressed="true"] .remembered { animation: fade-up .16s .16s ease-out both; }

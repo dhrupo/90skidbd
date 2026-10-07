@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { packChallenge } from '../../src/score.js';
+import { packChallenge, unpackChallenge } from '../../src/score.js';
 
 const firstN = (n) => Array.from({ length: 48 }, (_, i) => i < n);
 
@@ -13,8 +13,8 @@ test('sender gets a challenge link carrying their ticks and name', async ({ page
   await page.getByLabel('তোমার নাম').fill('রাফি');
   await page.getByRole('button', { name: /দেখি ও কয়টা পারে/ }).click();
   await expect.poll(() => page.evaluate(() => window.__url)).toContain('#c=');
-  const shared = await page.evaluate(() => window.__url);
-  expect(decodeURIComponent(shared)).toContain('n=রাফি');
+  const shared = new URL(await page.evaluate(() => window.__url));
+  expect(unpackChallenge(shared.hash)).toEqual({ ticks: firstN(3), name: 'রাফি' });
 });
 
 test('receiver plays, then sees how they compare with the sender', async ({ page }) => {
