@@ -4,8 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>নব্বইয়ের শিশু — তুমি কতটা নব্বইয়ের?</title>
+  <meta name="description" content="৪৮টা পুরানো স্মৃতি। কয়টা মনে আছে? টিক দাও, দেখো তুমি আসল নব্বইয়ের পোলাপান নাকি ভেজাল।">
+  <meta name="theme-color" content="#F3E6C3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atma:wght@400;500&family=Baloo+Da+2:wght@700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="src/style.css">
+  <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <h1>নব্বইয়ের পোলাপান, নাকি ভুয়া?</h1>
+  <header class="topbar">
+    <a class="brand" href="#top"><span aria-hidden="true">🎒</span> নব্বইয়ের শিশু</a>
+    <div class="meter">
+      <span class="meter-label">মনে আছে</span>
+      <span class="meter-value" data-testid="counter">০/৪৮</span>
+      <span class="meter-bar" aria-hidden="true"><i></i></span>
+    </div>
+  </header>
+
+  <main id="top" class="page">
+    <section class="intro">
+      <div class="label-card">
+        <p><span>নাম:</span> <b>নব্বইয়ের শিশু</b></p>
+        <p><span>শ্রেণি:</span> <b>১৯৯০ – ১৯৯৯</b></p>
+        <p><span>বিষয়:</span> <b>ছোটবেলা (ফেরত চাই)</b></p>
+        <div class="sticker" aria-hidden="true"><strong>সাবধান!</strong>চোখে পানি<br>আসতে পারে</div>
+      </div>
+      <h1>নব্বইয়ের পোলাপান, নাকি ভুয়া? <span aria-hidden="true">🤨</span></h1>
+      <p class="lede">নিচে ৪৮টা জিনিস আছে। যেটা দেখে মনে হবে “আরে, এটা তো আমাদের ছিল!” ওটায় ট্যাপ মারো। শেষে বোঝা যাবে তুমি আসল নাকি ভেজাল।</p>
+      <p class="margin-note"><span aria-hidden="true">↳</span> চুরি করবা না! ভুয়া টিক দিলে কান ধরে ১০ বার উঠবস <span aria-hidden="true">😤</span></p>
+      <a class="btn btn-blue" href="#ch-tv">আচ্ছা, দেখি তো! <span aria-hidden="true">✏️</span></a>
+    </section>
+
+    <nav class="toc" aria-label="সূচিপত্র">
+      <h2 class="kicker">সূচিপত্র</h2>
+      <ul id="chips"></ul>
+    </nav>
+
+    <div id="chapters"></div>
+  </main>
+
+  <div class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

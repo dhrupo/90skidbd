@@ -38,3 +38,5 @@ export function compare(me, them) {
   });
   return out;
 }
+
+export const bn = (v) => String(v).replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[d]);

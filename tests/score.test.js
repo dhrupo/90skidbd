@@ -52,3 +52,11 @@ test('compare splits memories into both, only me and only them', () => {
   const them = [true, false, true, false];
   assert.deepEqual(compare(me, them), { both: [0], onlyMe: [1], onlyThem: [2] });
 });
+
+import { bn } from '../src/score.js';
+
+test('numbers are written in Bangla digits', () => {
+  assert.equal(bn(0), '০');
+  assert.equal(bn(48), '৪৮');
+  assert.equal(bn('৩২/48'), '৩২/৪৮');
+});
