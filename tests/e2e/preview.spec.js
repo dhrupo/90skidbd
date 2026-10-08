@@ -46,3 +46,22 @@ test('an unknown or broken card id keeps the general preview', async ({ request 
 test('a picture that is not a 1200x630 card is refused', async ({ page }) => {
   expect((await uploadBlank(page, 1080, 1350)).status).toBe(400);
 });
+
+test('the wide card is a 1200x630 JPEG small enough to upload', async ({ page }) => {
+  await page.goto('/');
+  const out = await page.evaluate(async () => {
+    const { drawPreview } = await import('/src/share.js');
+    const { ITEMS } = await import('/src/items.js');
+    const results = [];
+    for (const [n, name] of [[0, ''], [33, 'রাফি'], [60, 'মুহাম্মদ আব্দুল্লাহ আল মা']]) {
+      const blob = await drawPreview(new Set(ITEMS.slice(0, n).map((it) => it.id)), name);
+      const bmp = await createImageBitmap(blob);
+      results.push({ type: blob.type, w: bmp.width, h: bmp.height, kb: Math.round(blob.size / 1024) });
+    }
+    return results;
+  });
+  for (const r of out) {
+    expect(r).toMatchObject({ type: 'image/jpeg', w: 1200, h: 630 });
+    expect(r.kb).toBeLessThan(300);
+  }
+});

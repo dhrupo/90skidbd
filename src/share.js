@@ -200,6 +200,123 @@ export async function drawShare(ticked, name = '') {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
+export async function drawPreview(ticked, name = '') {
+  await Promise.all(FONTS.map((f) => document.fonts.load(f, 'নব্বইয়ের ৬৭% A+')));
+  const imgs = await Promise.all(ITEMS.map((it) => photo(it.id)));
+  const PW = 1200;
+  const PH = 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = PW;
+  canvas.height = PH;
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = C.paper;
+  ctx.fillRect(0, 0, PW, PH);
+  ctx.fillStyle = C.rule;
+  for (let y = 36; y < PH; y += 36) ctx.fillRect(0, y, PW, 1.5);
+  ctx.strokeStyle = C.blue;
+  ctx.lineWidth = 5;
+  ctx.strokeRect(14, 14, PW - 28, PH - 28);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(26, 26, PW - 52, PH - 52);
+
+  const total = ticked.size;
+  const pct = percent(total, ITEMS.length);
+  const t = tier(pct);
+  const L = 60;
+
+  text(ctx, 'নব্বইয়ের শিশু উচ্চ বিদ্যালয় · মার্কশিট', L, 92, fitFont(ctx, 'নব্বইয়ের শিশু উচ্চ বিদ্যালয় · মার্কশিট', 800, '"Baloo Da 2"', 40, 680), C.ink);
+  text(ctx, 'নাম:', L, 146, '600 28px "Hind Siliguri"', C.muted);
+  if (name) text(ctx, name, L + 70, 146, fitFont(ctx, name, 400, 'Atma', 38, 600), C.blue);
+  else {
+    ctx.setLineDash([3, 7]);
+    ctx.strokeStyle = C.muted;
+    ctx.beginPath();
+    ctx.moveTo(L + 70, 150);
+    ctx.lineTo(L + 400, 150);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.strokeStyle = C.red;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(L + 34, 192, 34, 24, -0.08, 0, Math.PI * 2);
+  ctx.stroke();
+  text(ctx, t.grade, L + 34, 204, '400 32px Atma', C.red, 'center');
+  text(ctx, t.title, L + 84, 206, fitFont(ctx, t.title, 800, '"Baloo Da 2"', 40, 600), C.ink);
+
+  CHAPTERS.forEach((c, k) => {
+    const items = ITEMS.filter((it) => it.chapter === c.id);
+    const n = items.filter((it) => ticked.has(it.id)).length;
+    const x = L + (k % 2) * 362;
+    const y = 262 + Math.floor(k / 2) * 52;
+    text(ctx, c.chip, x, y, '600 24px "Hind Siliguri"', C.ink);
+    text(ctx, `${bn(n)}/${bn(items.length)}`, x + 128, y, '400 26px Atma', C.ink);
+    items.forEach((_, i) => {
+      const bx = x + 212 + i * 13;
+      ctx.strokeStyle = 'rgba(43, 33, 24, .35)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bx, y - 18, 10, 18);
+      if (i < n) {
+        ctx.fillStyle = '#1E7B34';
+        ctx.fillRect(bx + 2, y - 16, 6, 14);
+      }
+    });
+  });
+
+  const picks = CHAPTERS.map((c) => ITEMS.findIndex((it) => it.chapter === c.id && ticked.has(it.id))).filter((i) => i >= 0).slice(0, 3);
+  picks.forEach((i, k) => {
+    const x = L + k * 200;
+    const y = 438;
+    const angle = [-0.04, 0.035, -0.03][k];
+    ctx.save();
+    ctx.translate(x + 85, y + 64);
+    ctx.rotate(angle);
+    ctx.shadowColor = 'rgba(43, 33, 24, .3)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.fillStyle = '#FCF8EE';
+    ctx.fillRect(-91, -70, 182, 140);
+    ctx.shadowColor = 'transparent';
+    if (imgs[i]) drawCover(ctx, imgs[i], -85, -64, 170, 128);
+    ctx.restore();
+    tape(ctx, x + 85, y - 4, -angle * 2);
+  });
+  if (!picks.length) text(ctx, 'একটাও মনে নাই? 🫠', L, 520, '400 34px Atma', C.muted);
+
+  ctx.save();
+  ctx.translate(840, 70);
+  ctx.rotate(-0.05);
+  ctx.scale(2.3, 2.3);
+  ctx.strokeStyle = C.red;
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.stroke(RING);
+  ctx.restore();
+  text(ctx, `${bn(pct)}%`, 978, 240, fitFont(ctx, `${bn(pct)}%`, 800, '"Baloo Da 2"', 92, 210), C.red, 'center');
+  text(ctx, `মোট ${bn(total)}/${bn(ITEMS.length)}`, 978, 380, '400 32px Atma', C.ink, 'center');
+
+  const pass = t.grade !== 'F';
+  ctx.save();
+  ctx.translate(1060, 470);
+  ctx.rotate(-0.22);
+  ctx.strokeStyle = pass ? '#1E7B34' : C.red;
+  ctx.globalAlpha = 0.85;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, 0, 52, 0, Math.PI * 2);
+  ctx.stroke();
+  text(ctx, pass ? 'পাস' : 'ফেল', 0, 14, '800 38px "Baloo Da 2"', pass ? '#1E7B34' : C.red, 'center');
+  ctx.restore();
+
+  text(ctx, 'তুমি কয়টা পারো? 😏', 900, 568, '400 32px Atma', C.blue, 'center');
+  text(ctx, location.host, 900, 600, '700 22px "Hind Siliguri"', C.muted, 'center');
+
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+}
+
 export function saveImage(blob) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
