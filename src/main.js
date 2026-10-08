@@ -18,14 +18,16 @@ function sessionSet(key, value) {
   try { sessionStorage.setItem(key, value); } catch { /* storage blocked: challenge just won't survive a reload */ }
 }
 
+try { localStorage.removeItem(STORE); } catch { /* storage blocked: nothing old to clean */ }
+
 function load() {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORE));
+    const saved = JSON.parse(sessionStorage.getItem(STORE));
     return Array.isArray(saved) ? ITEMS.map((it) => it.id).filter((id) => saved.includes(id)) : [];
   } catch { return []; }
 }
 function save() {
-  try { localStorage.setItem(STORE, JSON.stringify([...ticked])); } catch { /* private mode: ticks just won't persist */ }
+  try { sessionStorage.setItem(STORE, JSON.stringify([...ticked])); } catch { /* private mode: ticks just won't persist */ }
 }
 
 const TICK_SVG = '<svg class="tick" viewBox="0 0 64 48" aria-hidden="true"><path d="M5 26c6 4 11 9 16 17C30 25 43 11 59 4" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -250,6 +252,19 @@ result.addEventListener('close', () => {
   renderBar();
 });
 document.getElementById('close-btn').addEventListener('click', () => result.close());
+document.getElementById('restart-btn').addEventListener('click', () => {
+  result.close();
+  ticked.clear();
+  save();
+  senderEl.value = '';
+  uploaded = { key: '', id: '' };
+  closedOnce = false;
+  halfwayShown = false;
+  spoken.clear();
+  document.querySelectorAll('.card').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+  render();
+  scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' });
+});
 
 const chapterDone = (c) => ITEMS.every((it) => it.chapter !== c.id || ticked.has(it.id));
 

@@ -31,7 +31,7 @@ Each grade has its own pool of teacher remarks. Subjects on the marksheet are gr
 
 ## Privacy
 
-- **Ticks** are saved only in your own browser (`localStorage`).
+- **Ticks** are kept only in the open browser tab (`sessionStorage`). A reload keeps them; a new tab or visit starts fresh, and **নতুন করে খেলো 🔄** clears them.
 - **The challenge link** carries your ticks and optional name inside the link itself (`#c=…&n=…`). Names from a link are always shown as plain text and cut to 20 characters.
 - **Sharing to Facebook, X or WhatsApp** uploads one wide score card picture (your name, score, grade and subject marks), so link previews show *your* result. It's stored in Cloudflare Workers KV under a random id and **deleted automatically after 7 days**. Nothing else is stored, and there are no accounts or cookies.
   - Only a 1200×630 JPEG under 300KB is accepted, at most 5 uploads per minute per connection.
