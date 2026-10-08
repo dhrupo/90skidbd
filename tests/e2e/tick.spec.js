@@ -51,7 +51,7 @@ test('every chapter has 10 cards and every photo file exists', async ({ page, re
   const srcs = await page.locator('.card img').evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src')));
   expect(srcs).toHaveLength(60);
   for (const src of srcs) {
-    const res = await request.get('/' + src);
+    const res = await request.get(src);
     expect(res.ok(), src).toBe(true);
     expect(res.headers()['content-type']).toContain('image/webp');
   }
@@ -90,8 +90,8 @@ test('"play again" clears every tick and the name and starts over', async ({ pag
   await expect(page.locator('#chapters .card[aria-pressed="true"]')).toHaveCount(0);
   await expect(page.getByTestId('submit-bar')).toBeHidden();
   await expect(page.getByLabel('তোমার নাম')).toHaveValue('');
-  await page.reload();
-  await expect(counter(page)).toHaveText('০/৬০');
+  await expect(page.locator(':focus')).toHaveText(/নব্বইয়ের পোলাপান/);
+  expect(await page.evaluate(() => sessionStorage.getItem('90skid-ticks'))).toBe('[]');
   await cards.nth(0).click();
   await expect(page.getByTestId('submit-bar').getByRole('button')).toHaveText(/রেজাল্ট দেখাও/);
 });

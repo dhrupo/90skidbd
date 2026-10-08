@@ -3,6 +3,7 @@ import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } fro
 import { drawPreview, drawShare, saveImage, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
+if (location.pathname.startsWith('/s/')) history.replaceState(null, '', `/${location.hash}`);
 const TOTAL = ITEMS.length;
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const ticked = new Set(load());
@@ -34,7 +35,7 @@ const TICK_SVG = '<svg class="tick" viewBox="0 0 64 48" aria-hidden="true"><path
 
 function cardHtml(item) {
   return `<button type="button" class="card" data-id="${item.id}" aria-pressed="${ticked.has(item.id)}">
-    <span class="photo"><img src="photos/${item.id}.webp" alt="" width="400" height="300" loading="lazy" decoding="async">${TICK_SVG}</span>
+    <span class="photo"><img src="/photos/${item.id}.webp" alt="" width="400" height="300" loading="lazy" decoding="async">${TICK_SVG}</span>
     <span class="caption">${item.caption}</span>
     <span class="remembered" aria-hidden="true">✔ মনে আছে</span>
   </button>`;
@@ -182,12 +183,11 @@ async function updatePreview() {
 }
 
 const challengeHash = () => packChallenge(ITEMS.map((it) => ticked.has(it.id)), senderEl.value);
-const challengeUrl = (cardId) => location.origin + location.pathname + (cardId ? `?s=${cardId}` : '') + challengeHash();
+const challengeUrl = (cardId) => `${location.origin}/${cardId ? `s/${cardId}` : ''}${challengeHash()}`;
 let uploaded = { key: '', id: '' };
+let pending = { key: '', promise: null };
 
-async function cardLink() {
-  const key = challengeHash();
-  if (uploaded.key === key) return challengeUrl(uploaded.id);
+async function uploadCard(key) {
   try {
     const blob = await drawPreview(new Set(ticked), senderEl.value);
     const res = await fetch('/api/card', { method: 'POST', body: blob, headers: { 'content-type': 'image/jpeg' }, signal: AbortSignal.timeout(4000) });
@@ -197,6 +197,14 @@ async function cardLink() {
   } catch {
     return challengeUrl();
   }
+}
+
+function cardLink() {
+  const key = challengeHash();
+  if (uploaded.key === key) return Promise.resolve(challengeUrl(uploaded.id));
+  if (pending.key !== key) pending = { key, promise: uploadCard(key) };
+  const giveUp = new Promise((resolve) => { setTimeout(() => resolve(challengeUrl()), 4000); });
+  return Promise.race([pending.promise, giveUp]);
 }
 const brag = () => `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
 const enc = encodeURIComponent;
@@ -264,12 +272,17 @@ result.addEventListener('close', () => {
 });
 document.getElementById('close-btn').addEventListener('click', () => result.close());
 document.getElementById('restart-btn').addEventListener('click', () => {
+  result.addEventListener('close', () => {
+    closedOnce = false;
+    renderBar();
+    document.querySelector('h1').focus();
+  }, { once: true });
   result.close();
   ticked.clear();
   save();
   senderEl.value = '';
   uploaded = { key: '', id: '' };
-  closedOnce = false;
+  pending = { key: '', promise: null };
   halfwayShown = false;
   spoken.clear();
   document.querySelectorAll('.card').forEach((c) => c.setAttribute('aria-pressed', 'false'));

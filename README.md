@@ -37,7 +37,7 @@ Each grade has its own pool of teacher remarks. Subjects on the marksheet are gr
 - **Ticks** are kept only in the open browser tab (`sessionStorage`). A reload keeps them; a new tab or visit starts fresh, and **নতুন করে খেলো 🔄** clears them.
 - **The challenge link** carries your ticks and optional name inside the link itself (`#c=…&n=…`). Names from a link are always shown as plain text and cut to 20 characters.
 - **Sharing to Facebook, X or WhatsApp** uploads one wide score card picture (your name, score, grade and subject marks), so link previews show *your* result. It's stored in Cloudflare Workers KV under a random id and **deleted automatically after 7 days**. Nothing else is stored, and there are no accounts or cookies.
-  - Only a 1200×630 JPEG under 300KB is accepted, at most 5 uploads per minute per connection.
+  - Only a 1200×630 JPEG under 300KB is accepted, only from the site's own page, at most 20 uploads per minute per internet address.
 - Instagram, "more" and save never upload anything.
 
 ## Tech
@@ -46,8 +46,8 @@ Each grade has its own pool of teacher remarks. Subjects on the marksheet are gr
 - A tiny Cloudflare Worker (`worker/`) sits in front of the static files:
   - `POST /api/card` stores a score card in KV for 7 days.
   - `GET /c/<id>.jpg` serves it.
-  - `/?s=<id>` swaps the page's `og:image` to that card for link previews.
-  - Everything else is plain static files.
+  - `/s/<id>` serves the page with `og:image` swapped to that card for link previews.
+  - Everything else, including the homepage, is plain static files that never touch the Worker.
 - The share image is drawn with the browser's Canvas API.
 - The result pop-up is a native `<dialog>`.
 - Fonts: Hind Siliguri, Baloo Da 2 and Atma (Google Fonts).
@@ -98,7 +98,7 @@ This needs macOS `sips` and `cwebp`.
 ## Deploy (Cloudflare)
 
 The repo is connected to Cloudflare Workers Builds. Each push to `main` runs `npx wrangler deploy`, using `wrangler.jsonc`:
-- the Worker in `worker/index.js`
+- the Worker in `worker/index.js`, which runs only for `/s/*`, `/api/*` and `/c/*`
 - the static site from the repo root, filtered by `.assetsignore`
 - a KV namespace `CARDS` (score cards, 7-day expiry) and a rate-limit binding `UPLOADS`
 

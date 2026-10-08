@@ -11,7 +11,7 @@ const photos = new Map();
 function photo(id) {
   if (!photos.has(id)) {
     const img = new Image();
-    img.src = `photos/${id}.webp`;
+    img.src = `/photos/${id}.webp`;
     photos.set(id, img.decode().then(() => img, () => null));
   }
   return photos.get(id);

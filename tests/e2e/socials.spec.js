@@ -70,7 +70,7 @@ test('X shares a link whose preview is my own score card', async ({ page, reques
   const dialog = await play(page);
   await dialog.getByRole('button', { name: 'X-এ শেয়ার' }).click();
   const shared = new URL(new URL(await opened(page)).searchParams.get('url'));
-  const id = shared.searchParams.get('s');
+  const id = shared.pathname.match(/^\/s\/(\w+)$/)?.[1];
   expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
   expect(unpackChallenge(shared.hash)).toEqual({ ticks: firstN(3), name: 'রাফি' });
   const card = await request.get(`/c/${id}.jpg`);
@@ -87,8 +87,9 @@ test('sharing the same result to several apps uploads the card only once', async
   await dialog.getByRole('button', { name: 'হোয়াটসঅ্যাপে শেয়ার' }).click();
   await expect.poll(() => page.evaluate(() => window.__opened.length)).toBe(2);
   const [fb, wa] = await page.evaluate(() => window.__opened);
-  const fbId = new URL(new URL(fb).searchParams.get('u')).searchParams.get('s');
-  expect(new URL(wa).searchParams.get('text')).toContain(`?s=${fbId}`);
+  const fbId = new URL(new URL(fb).searchParams.get('u')).pathname.split('/')[2];
+  expect(fbId).toMatch(/^[A-Za-z0-9]{10}$/);
+  expect(new URL(wa).searchParams.get('text')).toContain(`/s/${fbId}#c=`);
   expect(uploads).toBe(1);
 });
 
@@ -114,7 +115,7 @@ for (const [why, handler] of [
     const dialog = await play(page);
     await dialog.getByRole('button', { name: 'X-এ শেয়ার' }).click();
     const shared = new URL(new URL(await opened(page)).searchParams.get('url'));
-    expect(shared.searchParams.has('s')).toBe(false);
+    expect(shared.pathname).toBe('/');
     expect(unpackChallenge(shared.hash)?.name).toBe('রাফি');
   });
 }
@@ -170,4 +171,33 @@ test.describe('on a computer', () => {
     expect(await page.evaluate(() => window.__opened.at(-1))).toContain('x.com/intent/tweet');
     expect(await page.evaluate(() => window.__shared)).toBeUndefined();
   });
+});
+
+test('a quick double tap still uploads the card only once', async ({ page }) => {
+  let uploads = 0;
+  page.on('request', (r) => { if (r.method() === 'POST' && r.url().endsWith('/api/card')) uploads++; });
+  const dialog = await play(page);
+  const fb = dialog.getByRole('button', { name: 'ফেসবুকে শেয়ার' });
+  await Promise.all([fb.click(), fb.click({ delay: 20 })]);
+  await expect.poll(() => page.evaluate(() => window.__opened.length)).toBe(2);
+  expect(uploads).toBe(1);
+});
+
+test('if drawing the card is slow, sharing gives up waiting and uses the plain link', async ({ page }) => {
+  test.setTimeout(30000);
+  const dialog = await play(page);
+  await page.evaluate(() => {
+    const real = FontFaceSet.prototype.load;
+    FontFaceSet.prototype.load = function (...args) { return new Promise((r) => setTimeout(() => r(real.apply(this, args)), 8000)); };
+  });
+  const started = Date.now();
+  await dialog.getByRole('button', { name: 'X-এ শেয়ার' }).click();
+  const shared = new URL(new URL(await opened(page)).searchParams.get('url'));
+  expect(shared.pathname).toBe('/');
+  expect(Date.now() - started).toBeLessThan(6500);
+});
+
+test('the privacy note says the name is on the stored card', async ({ page }) => {
+  const dialog = await play(page);
+  await expect(dialog.locator('.privacy-note')).toContainText('নামসহ');
 });

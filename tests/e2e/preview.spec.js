@@ -29,15 +29,15 @@ test('an uploaded card is served back and becomes the link preview', async ({ pa
   expect(card.headers()['content-type']).toBe('image/jpeg');
   expect(jpegSize(await card.body())).toEqual({ w: 1200, h: 630 });
 
-  const html = await (await request.get(`/?s=${body.id}`)).text();
+  const html = await (await request.get(`/s/${body.id}`)).text();
   expect(html).toContain(`<meta property="og:image" content="http://localhost:4173/c/${body.id}.jpg">`);
   expect(html).toContain(`<meta name="twitter:image" content="http://localhost:4173/c/${body.id}.jpg">`);
-  expect(html).toContain(`<meta property="og:url" content="http://localhost:4173/?s=${body.id}">`);
+  expect(html).toContain(`<meta property="og:url" content="http://localhost:4173/s/${body.id}">`);
 });
 
 test('an unknown or broken card id keeps the general preview', async ({ request }) => {
   for (const s of ['AAAAAAAAAA', '../../etc', '<script>']) {
-    const html = await (await request.get(`/?s=${encodeURIComponent(s)}`)).text();
+    const html = await (await request.get(`/s/${encodeURIComponent(s)}`)).text();
     expect(html).toContain('og.png');
     expect(html).not.toContain('/c/');
   }
@@ -64,4 +64,21 @@ test('the wide card is a 1200x630 JPEG small enough to upload', async ({ page })
     expect(r).toMatchObject({ type: 'image/jpeg', w: 1200, h: 630 });
     expect(r.kb).toBeLessThan(300);
   }
+});
+
+test('the homepage ignores ?s= and stays plain static files', async ({ page, request }) => {
+  const { body } = await uploadBlank(page);
+  const html = await (await request.get(`/?s=${body.id}`)).text();
+  expect(html).toContain('og.png');
+  expect(html).not.toContain(`/c/${body.id}`);
+});
+
+test('opening a personal link plays the game and tidies the address', async ({ page }) => {
+  const { body } = await uploadBlank(page);
+  await page.goto(`/s/${body.id}#c=______8AAAA&n=${encodeURIComponent('রাফি')}`);
+  await expect(page.locator('#chapters .card')).toHaveCount(60);
+  await expect(page.getByTestId('challenge-banner')).toContainText('রাফি');
+  await expect(page).toHaveURL(/localhost:4173\/#c=/);
+  await page.locator('.card').first().click();
+  await expect(page.getByTestId('counter')).toHaveText('১/৬০');
 });
