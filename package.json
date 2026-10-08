@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "serve": "python3 -m http.server 4173",
+    "serve": "wrangler dev --port 4173 --ip 0.0.0.0",
     "test": "node --test tests/",
     "e2e": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0"
+    "@playwright/test": "^1.63.0",
+    "wrangler": "^4.148.0"
   }
 }
