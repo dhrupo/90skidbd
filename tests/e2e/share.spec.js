@@ -42,7 +42,7 @@ test('without a share sheet the PNG downloads instead', async ({ page }) => {
 test('the result shows a preview of the share image', async ({ page }) => {
   await page.goto('/');
   await tickAndReveal(page, 3);
-  const preview = page.getByRole('img', { name: /শেয়ার ছবি/ });
+  const preview = page.getByRole('img', { name: /মার্কশিট/ });
   await expect(preview).toBeVisible();
   await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
 });
@@ -51,6 +51,43 @@ test('older phones without canvas roundRect still get a share image', async ({ p
   await page.addInitScript(() => { delete CanvasRenderingContext2D.prototype.roundRect; });
   await page.goto('/');
   await tickAndReveal(page, 3);
-  const preview = page.getByRole('img', { name: /শেয়ার ছবি/ });
+  const preview = page.getByRole('img', { name: /মার্কশিট/ });
   await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
+});
+
+test('the marksheet preview sits under the name box and redraws as you type', async ({ page }) => {
+  await page.goto('/');
+  await tickAndReveal(page, 7);
+  const dialog = page.getByRole('dialog');
+  const name = dialog.getByLabel('তোমার নাম');
+  const preview = dialog.getByRole('img', { name: /মার্কশিট/ });
+  await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
+  const nameBox = await name.boundingBox();
+  const previewBox = await preview.boundingBox();
+  expect(nameBox.y).toBeLessThan(previewBox.y);
+  const before = await preview.getAttribute('src');
+  await name.fill('রাফি');
+  await expect.poll(() => preview.getAttribute('src')).not.toBe(before);
+  await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
+});
+
+test('the post button waits until the marksheet is ready, then shares at once', async ({ page }) => {
+  await page.route('**/photos/*.webp', async (route) => {
+    await new Promise((r) => setTimeout(r, 1500));
+    await route.continue();
+  });
+  await page.addInitScript(() => {
+    navigator.canShare = () => true;
+    navigator.share = async ({ files }) => { window.__sharedAt = performance.now(); window.__file = files[0].type; };
+  });
+  await page.goto('/');
+  await page.locator('.card').first().click();
+  await page.getByTestId('submit-bar').getByRole('button').click();
+  const post = page.getByRole('button', { name: /পোস্ট মারো/ });
+  await expect(post).toBeDisabled();
+  await expect(post).toBeEnabled({ timeout: 15000 });
+  const clickedAt = await page.evaluate(() => performance.now());
+  await post.click();
+  await expect.poll(() => page.evaluate(() => window.__file)).toBe('image/png');
+  expect(await page.evaluate(() => window.__sharedAt) - clickedAt).toBeLessThan(500);
 });

@@ -43,16 +43,16 @@ for (const [label, saved] of [
   });
 }
 
-test('every chapter has 10 cards and every photo loads', async ({ page }) => {
-  const missing = [];
-  page.on('response', (r) => { if (r.url().includes('/photos/') && !r.ok()) missing.push(r.url()); });
+test('every chapter has 10 cards and every photo file exists', async ({ page, request }) => {
   await page.goto('/');
   for (const ch of ['tv', 'tiffin', 'school', 'khela', 'gadget', 'eid']) {
     await expect(page.locator(`#ch-${ch} .card`)).toHaveCount(10);
   }
-  for (const img of await page.locator('.card img').all()) {
-    await img.scrollIntoViewIfNeeded();
-    await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth)).toBeGreaterThan(0);
+  const srcs = await page.locator('.card img').evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src')));
+  expect(srcs).toHaveLength(60);
+  for (const src of srcs) {
+    const res = await request.get('/' + src);
+    expect(res.ok(), src).toBe(true);
+    expect(res.headers()['content-type']).toContain('image/webp');
   }
-  expect(missing).toEqual([]);
 });

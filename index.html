@@ -55,10 +55,10 @@
     <div id="chapters"></div>
   </main>
 
-  <div class="submit-bar" data-testid="submit-bar" hidden>
+  <aside class="submit-bar" data-testid="submit-bar" aria-label="রেজাল্ট" hidden>
     <span class="submit-count"></span>
     <button type="button" class="btn btn-blue" id="submit-btn"></button>
-  </div>
+  </aside>
 
   <dialog class="result" id="result" aria-labelledby="h-result">
     <div class="sheet">
@@ -87,9 +87,11 @@
       <div class="share">
         <div class="share-head">
           <h3>ফেসবুকে এমন দেখাবে</h3>
-          <p>রঙিন = মনে আছে, ধূসর = ভুলছো</p>
+          <p>নাম দিলে মার্কশিটে উঠবে</p>
         </div>
-        <img class="share-preview" hidden alt="তোমার শেয়ার ছবি: স্কোর আর ৪৮টা স্মৃতির গ্রিড" width="1080" height="1350">
+        <label class="name-label" for="sender">তোমার নাম</label>
+        <input id="sender" name="sender" maxlength="20" autocomplete="given-name" placeholder="না দিলেও চলবে">
+        <img class="share-preview" hidden alt="তোমার মার্কশিট: বিষয়ভিত্তিক নম্বর, মোট স্কোর আর মন্তব্য" width="1080" height="1350">
         <button type="button" class="btn btn-blue" id="share-btn">
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
           ছবিটা পোস্ট মারো
@@ -98,8 +100,6 @@
 
       <form class="challenge" id="challenge">
         <h3>বন্ধুকে একটু খোঁচা দাও <span aria-hidden="true">😈</span></h3>
-        <label for="sender">তোমার নাম</label>
-        <input id="sender" name="sender" maxlength="20" autocomplete="given-name" placeholder="না দিলেও চলবে">
         <button type="submit" class="btn btn-red" id="challenge-btn">দেখি ও কয়টা পারে <span aria-hidden="true">🥊</span></button>
       </form>
     </div>

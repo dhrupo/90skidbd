@@ -33,7 +33,7 @@ test('the button opens a pop-up report card with share and challenge', async ({ 
   await expect(dialog).toBeVisible();
   await expect(dialog.getByTestId('score')).toHaveText('৬৭%');
   await expect(dialog.getByTestId('rank')).toContainText('পাক্কা নব্বইয়ের পোলাপান');
-  await expect.poll(() => dialog.getByRole('img', { name: /শেয়ার ছবি/ }).evaluate((img) => img.naturalWidth)).toBe(1080);
+  await expect.poll(() => dialog.getByRole('img', { name: /মার্কশিট/ }).evaluate((img) => img.naturalWidth)).toBe(1080);
   await expect(dialog.getByRole('button', { name: /পোস্ট মারো/ })).toBeVisible();
   await expect(dialog.getByLabel('তোমার নাম')).toBeVisible();
 });
@@ -92,4 +92,10 @@ test('with reduce-motion the pop-up shows the final score at once', async ({ pag
   await bar(page).getByRole('button').click();
   await expect(dialogOf(page).getByTestId('score')).toHaveText('২৫%', { timeout: 200 });
   expect(await dialogOf(page).evaluate((d) => getComputedStyle(d).animationName)).toBe('none');
+});
+
+test('the submit bar is a labelled landmark for screen readers', async ({ page }) => {
+  await page.goto('/');
+  await tick(page, 1);
+  await expect(page.getByRole('complementary', { name: 'রেজাল্ট' })).toBeVisible();
 });

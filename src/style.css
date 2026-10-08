@@ -329,7 +329,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   border-radius: 4px;
   box-shadow: 0 1px 1px #2B21181F, 0 8px 18px -8px #2B211859;
 }
-.btn[aria-busy="true"] { opacity: .7; cursor: progress; }
+.btn:disabled { opacity: .6; cursor: progress; }
 
 .challenge-banner {
   margin: 0 0 20px;
@@ -354,8 +354,11 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 
 .challenge { margin-top: 40px; display: grid; gap: 8px; }
 .challenge h3 { font: 700 15px var(--body); }
-.challenge label { font: 400 13px var(--body); color: var(--muted); }
-.challenge input {
+.name-label { display: block; margin-top: 12px; font: 400 13px var(--body); color: var(--muted); }
+#sender {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
   min-height: 52px;
   padding: 12px 14px;
   border: 1.5px solid #2B211840;
@@ -364,7 +367,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   color: var(--ink);
   font: 400 16px var(--body);
 }
-.challenge input::placeholder { color: var(--muted); }
+#sender::placeholder { color: var(--muted); }
 .btn-red { margin-top: 4px; background: var(--card); color: var(--red); border: 2px solid var(--red); box-shadow: 3px 3px 0 var(--red); }
 .btn-red.copied { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
 

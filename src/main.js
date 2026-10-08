@@ -153,6 +153,12 @@ function renderBar() {
 }
 
 const preview = document.querySelector('.share-preview');
+const senderEl = document.getElementById('sender');
+let nameTimer;
+senderEl.addEventListener('input', () => {
+  clearTimeout(nameTimer);
+  nameTimer = setTimeout(updatePreview, 250);
+});
 const shareBtn = document.getElementById('share-btn');
 let shareBlob = null;
 let drawing = 0;
@@ -160,9 +166,11 @@ let drawing = 0;
 async function updatePreview() {
   const mine = ++drawing;
   shareBlob = null;
-  const blob = await drawShare(new Set(ticked));
+  shareBtn.disabled = true;
+  const blob = await drawShare(new Set(ticked), senderEl.value);
   if (mine !== drawing) return;
   shareBlob = blob;
+  shareBtn.disabled = false;
   const old = preview.src;
   preview.src = URL.createObjectURL(blob);
   preview.hidden = false;
@@ -170,21 +178,19 @@ async function updatePreview() {
 }
 
 shareBtn.addEventListener('click', async () => {
-  shareBtn.setAttribute('aria-busy', 'true');
+  if (!shareBlob) return;
   try {
-    const how = await shareImage(shareBlob || await drawShare(new Set(ticked)));
+    const how = await shareImage(shareBlob);
     if (how === 'downloaded') toast('ছবি সেভ হইছে। না হলে উপরের ছবিটা চেপে ধরে সেভ করো 👆');
   } catch {
     toast('শেয়ার হইল না 😕 আবার চাপো তো');
-  } finally {
-    shareBtn.removeAttribute('aria-busy');
   }
 });
 
 const challengeBtn = document.getElementById('challenge-btn');
 document.getElementById('challenge').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const name = document.getElementById('sender').value;
+  const name = senderEl.value;
   const url = location.origin + location.pathname + packChallenge(ITEMS.map((it) => ticked.has(it.id)), name);
   const text = `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
   try {
