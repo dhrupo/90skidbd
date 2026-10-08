@@ -39,6 +39,7 @@ Each grade has its own pool of teacher remarks. Subjects on the marksheet are gr
 - **Sharing to Facebook, X or WhatsApp** uploads one wide score card picture (your name, score, grade and subject marks), so link previews show *your* result. It's stored in Cloudflare Workers KV under a random id and **deleted automatically after 7 days**. Nothing else is stored, and there are no accounts or cookies.
   - Only a 1200×630 JPEG under 300KB is accepted, only from the site's own page, at most 20 uploads per minute per internet address.
 - Instagram, "more" and save never upload anything.
+- **Visitor stats** come from Cloudflare Web Analytics: anonymous page views, no cookies. It loads only on the live site, never during local development or tests.
 
 ## Tech
 

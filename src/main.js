@@ -351,3 +351,11 @@ document.getElementById('chapters').addEventListener('click', (e) => {
 render();
 document.querySelector('.footer').hidden = false;
 document.querySelector('.margin-note').textContent = '↳ ' + pick(WARNINGS);
+
+if (!['localhost', '127.0.0.1'].includes(location.hostname)) {
+  const beacon = document.createElement('script');
+  beacon.defer = true;
+  beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  beacon.dataset.cfBeacon = JSON.stringify({ token: '43e6db2d26cb4261811500ea1ec53112' });
+  document.head.append(beacon);
+}
