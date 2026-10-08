@@ -107,22 +107,22 @@ export async function drawShare(ticked, name = '') {
     const items = ITEMS.filter((it) => it.chapter === c.id);
     const n = items.filter((it) => ticked.has(it.id)).length;
     ctx.fillStyle = 'rgba(43, 33, 24, .14)';
-    ctx.fillRect(tx, y + 61, tw, 1.5);
-    text(ctx, c.chip, tx + 20, y + 42, '600 32px "Hind Siliguri"', C.ink);
-    text(ctx, `${bn(n)}/${bn(items.length)}`, tx + 330, y + 44, '400 36px Atma', C.ink, 'center');
+    ctx.fillRect(tx, y + 55, tw, 1.5);
+    text(ctx, c.chip, tx + 20, y + 39, '600 32px "Hind Siliguri"', C.ink);
+    text(ctx, `${bn(n)}/${bn(items.length)}`, tx + 330, y + 41, '400 36px Atma', C.ink, 'center');
     items.forEach((_, i) => {
       const bx = tx + 400 + i * 34;
       ctx.strokeStyle = 'rgba(43, 33, 24, .35)';
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(bx, y + 17, 26, 26);
+      ctx.strokeRect(bx, y + 15, 24, 24);
       if (i < n) {
         ctx.fillStyle = '#1E7B34';
-        ctx.fillRect(bx + 4, y + 21, 18, 18);
+        ctx.fillRect(bx + 4, y + 19, 16, 16);
       }
     });
     const g = tier(percent(n, items.length)).grade;
-    text(ctx, g, tx + tw - 50, y + 45, '400 40px Atma', g === 'F' ? C.red : '#1E7B34', 'center');
-    y += 62;
+    text(ctx, g, tx + tw - 50, y + 42, '400 40px Atma', g === 'F' ? C.red : '#1E7B34', 'center');
+    y += 56;
   }
 
   y += 20;
@@ -164,7 +164,7 @@ export async function drawShare(ticked, name = '') {
   });
   if (!picks.length) text(ctx, 'একটাও মনে নাই? 🫠', W / 2, y + 64, '400 36px Atma', C.muted, 'center');
 
-  y = 1218;
+  y = 1166;
   ctx.strokeStyle = C.blue;
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -179,7 +179,7 @@ export async function drawShare(ticked, name = '') {
 
   const pass = t.grade !== 'F';
   ctx.save();
-  ctx.translate(W - PAD - 120, y - 14);
+  ctx.translate(W - PAD - 120, y + 4);
   ctx.rotate(-0.22);
   ctx.strokeStyle = pass ? '#1E7B34' : C.red;
   ctx.globalAlpha = 0.85;
@@ -194,8 +194,8 @@ export async function drawShare(ticked, name = '') {
   text(ctx, pass ? 'পাস' : 'ফেল', 0, 20, '800 58px "Baloo Da 2"', pass ? '#1E7B34' : C.red, 'center');
   ctx.restore();
 
-  text(ctx, `তুমি কয়টা পারো? 😏  ${location.host}`, W / 2, 1286, '400 32px Atma', C.blue, 'center');
-  text(ctx, 'made by dhrupo', W - 52, H - 52, '400 18px "Hind Siliguri"', 'rgba(43, 33, 24, .4)', 'right');
+  text(ctx, `তুমি কয়টা পারো? 😏  ${location.host}`, W / 2, 1278, '400 32px Atma', C.blue, 'center');
+  text(ctx, 'made by dhrupo', W - 60, H - 58, '400 18px "Hind Siliguri"', 'rgba(43, 33, 24, .4)', 'right');
 
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
