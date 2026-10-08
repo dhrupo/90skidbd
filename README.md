@@ -31,14 +31,20 @@ Each grade has its own pool of teacher remarks. Subjects on the marksheet are gr
 
 ## Privacy
 
-There's no server, database, account or cookie:
-- Ticks are saved only in your own browser (`localStorage`).
-- A challenge link carries the ticks and the optional name inside the link itself (`#c=…&n=…`). They're never sent anywhere.
-- Names from a link are always shown as plain text and cut to 20 characters.
+- **Ticks** are saved only in your own browser (`localStorage`).
+- **The challenge link** carries your ticks and optional name inside the link itself (`#c=…&n=…`). Names from a link are always shown as plain text and cut to 20 characters.
+- **Sharing to Facebook, X or WhatsApp** uploads one wide score card picture (your name, score, grade and subject marks), so link previews show *your* result. It's stored in Cloudflare Workers KV under a random id and **deleted automatically after 7 days**. Nothing else is stored, and there are no accounts or cookies.
+  - Only a 1200×630 JPEG under 300KB is accepted, at most 5 uploads per minute per connection.
+- Instagram, "more" and save never upload anything.
 
 ## Tech
 
-- Plain HTML, CSS and JavaScript (ES modules). **No framework and no build step.**
+- Plain HTML, CSS and JavaScript (ES modules). **No framework and no build step** for the site.
+- A tiny Cloudflare Worker (`worker/`) sits in front of the static files:
+  - `POST /api/card` stores a score card in KV for 7 days.
+  - `GET /c/<id>.jpg` serves it.
+  - `/?s=<id>` swaps the page's `og:image` to that card for link previews.
+  - Everything else is plain static files.
 - The share image is drawn with the browser's Canvas API.
 - The result pop-up is a native `<dialog>`.
 - Fonts: Hind Siliguri, Baloo Da 2 and Atma (Google Fonts).
@@ -49,7 +55,8 @@ index.html          the page
 src/items.js        the 60 memories, chapters and all the random lines
 src/score.js        percent, tiers, challenge-link packing, comparison
 src/main.js         ticking, toasts, sticky bar, result pop-up, challenge
-src/share.js        draws the marksheet image and shares/downloads it
+src/share.js        draws the marksheet and the wide preview card, shares/downloads
+worker/             Cloudflare Worker: card upload, card serving, preview swap
 src/style.css       khata scrapbook look and animations
 photos/             400×300 WebP thumbnails, one per memory
 scripts/thumbs.sh   turns a folder of photos into thumbnails
@@ -58,17 +65,17 @@ tests/              unit tests + Playwright E2E specs
 
 ## Run locally
 
-Needs Node 20+ and Python 3.
+Needs Node 22+ (see `.nvmrc`).
 
 ```bash
 npm install
-npm run serve          # http://localhost:4173
+npm run serve          # wrangler dev on http://localhost:4173 (local KV, nothing touches Cloudflare)
 ```
 
 ## Tests
 
 ```bash
-npm test               # unit tests (node --test)
+npm test               # unit tests: score logic, card validation, Worker handlers
 npx playwright install chromium webkit   # first time only
 npm run e2e            # browser tests against the local site
 ```
@@ -87,11 +94,19 @@ This needs macOS `sips` and `cwebp`.
 
 ## Deploy (Cloudflare)
 
-The repo is connected to Cloudflare Workers Builds. Each push to `main` runs `npx wrangler deploy`, which serves the site as static assets using `wrangler.jsonc`.
-- `.assetsignore` keeps everything except the site out of the upload, so only `index.html`, `src/`, `photos/` and `og.png` go live. Add any new non-site files or folders there.
-- Check what would upload with `npx wrangler deploy --dry-run`.
+The repo is connected to Cloudflare Workers Builds. Each push to `main` runs `npx wrangler deploy`, using `wrangler.jsonc`:
+- the Worker in `worker/index.js`
+- the static site from the repo root, filtered by `.assetsignore`
+- a KV namespace `CARDS` (score cards, 7-day expiry) and a rate-limit binding `UPLOADS`
 
-Live at **https://90skidbd.dhrupo.workers.dev/**. The Facebook preview tags (`og:url`, `og:image`) in `index.html` must hold the live address. Update them when the address changes. The marksheet and share text print the current address on their own.
+One-time setup for the KV store:
+
+```bash
+npx wrangler login
+npx wrangler kv namespace create CARDS    # put the printed id into wrangler.jsonc
+```
+
+Live at **https://90skidbd.dhrupo.workers.dev/**. The general Facebook preview tags (`og:url`, `og:image`) in `index.html` must hold the live address. Personal previews use whatever address the site runs on.
 
 ## Photo removal
 
