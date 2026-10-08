@@ -402,6 +402,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .ico.wa { background: #1DA851; }
 .ico.more { background: var(--blue); }
 .ico.save { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+.privacy-note { margin: 14px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
 
 .footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(96px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
 .footer p { margin: 0; }

@@ -11,7 +11,7 @@ export default defineConfig({
     { name: 'iphone', use: { ...devices['iPhone 14'] } },
   ],
   webServer: {
-    command: `npx wrangler dev --port 4173 --ip 0.0.0.0 --persist-to ${path.join(os.tmpdir(), '90skidbd-wrangler')}`,
+    command: `npx wrangler dev --env test --port 4173 --ip 0.0.0.0 --persist-to ${path.join(os.tmpdir(), '90skidbd-wrangler')}`,
     url: 'http://127.0.0.1:4173',
     timeout: 120000,
     reuseExistingServer: true,

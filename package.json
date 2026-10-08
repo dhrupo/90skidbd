@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "serve": "wrangler dev --port 4173 --ip 0.0.0.0",
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.js",
     "e2e": "playwright test"
   },
   "devDependencies": {

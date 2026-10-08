@@ -1,6 +1,6 @@
 import { CHAPTERS, ITEMS, REMARKS, UNTICK, WARNINGS } from './items.js';
 import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } from './score.js';
-import { drawShare, saveImage, shareImage } from './share.js';
+import { drawPreview, drawShare, saveImage, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
@@ -177,20 +177,43 @@ async function updatePreview() {
   if (old) URL.revokeObjectURL(old);
 }
 
-const challengeUrl = () => location.origin + location.pathname + packChallenge(ITEMS.map((it) => ticked.has(it.id)), senderEl.value);
+const challengeHash = () => packChallenge(ITEMS.map((it) => ticked.has(it.id)), senderEl.value);
+const challengeUrl = (cardId) => location.origin + location.pathname + (cardId ? `?s=${cardId}` : '') + challengeHash();
+let uploaded = { key: '', id: '' };
+
+async function cardLink() {
+  const key = challengeHash();
+  if (uploaded.key === key) return challengeUrl(uploaded.id);
+  try {
+    const blob = await drawPreview(new Set(ticked), senderEl.value);
+    const res = await fetch('/api/card', { method: 'POST', body: blob, headers: { 'content-type': 'image/jpeg' }, signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error(res.status);
+    uploaded = { key, id: (await res.json()).id };
+    return challengeUrl(uploaded.id);
+  } catch {
+    return challengeUrl();
+  }
+}
 const brag = () => `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
 const enc = encodeURIComponent;
 const LINKS = {
-  facebook: () => `https://www.facebook.com/sharer/sharer.php?u=${enc(challengeUrl())}`,
-  x: () => `https://x.com/intent/tweet?text=${enc(brag())}&url=${enc(challengeUrl())}`,
-  whatsapp: () => `https://wa.me/?text=${enc(`${brag()} ${challengeUrl()}`)}`,
+  facebook: (url) => `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`,
+  x: (url) => `https://x.com/intent/tweet?text=${enc(brag())}&url=${enc(url)}`,
+  whatsapp: (url) => `https://wa.me/?text=${enc(`${brag()} ${url}`)}`,
 };
 
 document.querySelector('.socials').addEventListener('click', async (e) => {
   const kind = e.target.closest('[data-share]')?.dataset.share;
   if (!kind) return;
   if (LINKS[kind]) {
-    window.open(LINKS[kind](), '_blank', 'noopener');
+    const tab = window.open('about:blank', '_blank');
+    const target = LINKS[kind](await cardLink());
+    if (tab) {
+      tab.opener = null;
+      tab.location.href = target;
+    } else {
+      window.open(target, '_blank', 'noopener');
+    }
     return;
   }
   if (!shareBlob) return;
