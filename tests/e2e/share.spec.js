@@ -12,9 +12,9 @@ async function tickAndReveal(page, n) {
 test('share sheet receives a 1080x1350 PNG of the result', async ({ page }) => {
   await page.addInitScript(() => {
     navigator.canShare = () => true;
-    navigator.share = async ({ files }) => {
+    navigator.share = async ({ files, text }) => {
       const buf = new Uint8Array(await files[0].arrayBuffer());
-      window.__shared = { type: files[0].type, bytes: Array.from(buf.slice(0, 32)) };
+      window.__shared = { type: files[0].type, bytes: Array.from(buf.slice(0, 32)), text };
     };
   });
   await page.goto('/');
@@ -23,6 +23,7 @@ test('share sheet receives a 1080x1350 PNG of the result', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => window.__shared?.type)).toBe('image/png');
   const head = Buffer.from(await page.evaluate(() => window.__shared.bytes));
   expect(pngSize(head)).toEqual({ w: 1080, h: 1350 });
+  expect(await page.evaluate(() => window.__shared.text)).toContain('localhost:4173');
 });
 
 test('without a share sheet the PNG downloads instead', async ({ page }) => {

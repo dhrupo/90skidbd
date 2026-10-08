@@ -101,7 +101,7 @@ export async function shareImage(blob) {
   const file = new File([blob], 'nobboiyer-shishu.png', { type: 'image/png' });
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], text: 'আমি কতটা নব্বইয়ের, দেখো 😎 তুমি কয়টা পারো? 90skidbd.com' });
+      await navigator.share({ files: [file], text: `আমি কতটা নব্বইয়ের, দেখো 😎 তুমি কয়টা পারো? ${location.host}` });
     } catch (e) {
       if (e.name !== 'AbortError') throw e;
     }

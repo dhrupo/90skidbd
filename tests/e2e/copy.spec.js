@@ -60,3 +60,11 @@ test('the 51-80% remark sends you to school with your mum', async ({ page }) => 
   await page.getByTestId('submit-bar').getByRole('button').click();
   await expect(page.getByTestId('remark')).toContainText('কালকে আম্মুকে নিয়ে স্কুলে আসবে');
 });
+
+test('the page and its preview text say 60 memories', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.lede')).toContainText('৬০টা');
+  for (const sel of ['meta[name="description"]', 'meta[property="og:description"]']) {
+    await expect(page.locator(sel)).toHaveAttribute('content', /^৬০টা/);
+  }
+});
