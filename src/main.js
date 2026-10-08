@@ -1,4 +1,4 @@
-import { CHAPTERS, ITEMS, UNTICK, WARNINGS } from './items.js';
+import { CHAPTERS, ITEMS, REMARKS, UNTICK, WARNINGS } from './items.js';
 import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } from './score.js';
 import { drawShare, shareImage } from './share.js';
 
@@ -55,7 +55,8 @@ const counter = document.querySelector('[data-testid="counter"]');
 const toastEl = document.querySelector('.toast');
 let toastTimer;
 let halfwayShown = false;
-const pepShown = new Set();
+const spoken = new Set();
+const MILESTONES = [3, 6, 8];
 
 function toast(text) {
   toastEl.textContent = text;
@@ -78,13 +79,9 @@ const submitBtn = document.getElementById('submit-btn');
 let closedOnce = false;
 
 function remark(pct, missed) {
-  const sign = ' — ক্লাস টিচার';
   if (pct === 0) return 'আগে উপরে কিছু টিক দাও, তারপর রেজাল্ট 😑';
-  if (pct === 100) return 'সব মনে আছে?! তুমি তো চলমান জাদুঘর 🏛️' + sign;
-  if (pct <= 25) return 'এগুলা তোমার আব্বা-আম্মুর জিনিস, বুঝছি। তুমি টিকটক দেখো 😌' + sign;
-  if (pct <= 50) return 'অর্ধেক মনে আছে, বাকি অর্ধেক ইউটিউবে দেখছো। ঠিক বলছি না?' + sign;
-  if (pct <= 80) return `খারাপ না! কিন্তু ${bn(missed)}টা ভুলে গেলা কেমনে? কালকে আম্মুকে নিয়ে স্কুলে আসবে।` + sign;
-  return `${bn(missed)}টা মিস? চলো মাফ করলাম, বিটিভির লোগো বলে কথা!` + sign;
+  const band = pct === 100 ? 'full' : pct > 80 ? 'great' : pct > 50 ? 'good' : pct > 25 ? 'half' : 'low';
+  return pick(REMARKS[band]).replaceAll('{n}', bn(missed)).replaceAll('{total}', bn(TOTAL)) + ' — ক্লাস টিচার';
 }
 
 function countUp() {
@@ -214,21 +211,18 @@ submitBtn.addEventListener('click', () => {
   renderResult();
   result.showModal();
   result.append(toastEl);
-  history.pushState({ result: true }, '');
   replay(result, 'reveal');
   countUp();
   updatePreview();
 });
 
+result.addEventListener('cancel', (e) => e.preventDefault());
 result.addEventListener('close', () => {
   document.body.append(toastEl);
   closedOnce = true;
   renderBar();
-  if (history.state?.result) history.back();
 });
 document.getElementById('close-btn').addEventListener('click', () => result.close());
-result.addEventListener('click', (e) => { if (e.target === result) result.close(); });
-addEventListener('popstate', () => { if (result.open) result.close(); });
 
 const chapterDone = (c) => ITEMS.every((it) => it.chapter !== c.id || ticked.has(it.id));
 
@@ -276,11 +270,15 @@ document.getElementById('chapters').addEventListener('click', (e) => {
   if (ticked.size === TOTAL / 2 && !halfwayShown) {
     halfwayShown = true;
     toast('অর্ধেক শেষ! চা খাবা? ☕');
-  } else if (chapterDone(chapter)) {
-    toast(chapter.done);
-  } else if (inChapter === 3 && !pepShown.has(chapter.id)) {
-    pepShown.add(chapter.id);
-    toast(pick(chapter.pep));
+  } else if (chapterDone(chapter) && !spoken.has(`${chapter.id}:done`)) {
+    spoken.add(`${chapter.id}:done`);
+    toast(pick(chapter.done));
+  } else if (MILESTONES.includes(inChapter) && !spoken.has(`${chapter.id}:${inChapter}`)) {
+    spoken.add(`${chapter.id}:${inChapter}`);
+    const fresh = chapter.cheers.filter((line) => !spoken.has(line));
+    const line = pick(fresh.length ? fresh : chapter.cheers);
+    spoken.add(line);
+    toast(line);
   }
 });
 

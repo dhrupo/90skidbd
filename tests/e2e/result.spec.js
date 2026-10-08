@@ -27,7 +27,7 @@ test('reopening after another tick ends on the new score', async ({ page }) => {
   await page.goto('/');
   await tick(page, 30);
   const result = await openResult(page);
-  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'বন্ধ করো' }).click();
   await page.locator('.card').nth(30).click();
   await openResult(page);
   // JUSTIFIED: wait past the 900ms count-up so a stale final frame would be caught
