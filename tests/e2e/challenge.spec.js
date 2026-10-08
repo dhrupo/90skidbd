@@ -3,21 +3,6 @@ import { packChallenge, unpackChallenge } from '../../src/score.js';
 
 const firstN = (n) => Array.from({ length: 60 }, (_, i) => i < n);
 
-test('sender gets a challenge link carrying their ticks and name', async ({ page }) => {
-  await page.addInitScript(() => {
-    navigator.share = async ({ url }) => { window.__url = url; };
-  });
-  await page.goto('/');
-  const cards = page.locator('.card');
-  for (let i = 0; i < 3; i++) await cards.nth(i).click();
-  await page.getByTestId('submit-bar').getByRole('button').click();
-  await page.getByLabel('তোমার নাম').fill('রাফি');
-  await page.getByRole('button', { name: /দেখি ও কয়টা পারে/ }).click();
-  await expect.poll(() => page.evaluate(() => window.__url)).toContain('#c=');
-  const shared = new URL(await page.evaluate(() => window.__url));
-  expect(unpackChallenge(shared.hash)).toEqual({ ticks: firstN(3), name: 'রাফি' });
-});
-
 test('receiver plays, then sees how they compare with the sender', async ({ page }) => {
   await page.goto('/' + packChallenge(firstN(36), 'রাফি'));
   await expect(page.getByTestId('challenge-banner')).toContainText('রাফি তোমাকে চ্যালেঞ্জ');

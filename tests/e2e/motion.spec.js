@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { UNTICK } from '../../src/items.js';
+import { CHAPTERS, UNTICK } from '../../src/items.js';
 
 const toast = (page) => page.getByRole('status');
 
@@ -17,7 +17,7 @@ test('finishing a chapter stamps full marks', async ({ page }) => {
   for (let i = 0; i < 10; i++) await cards.nth(i).click();
   await expect(page.locator('#ch-tv .chapter-count')).toHaveText('১০/১০');
   await expect(page.locator('#ch-tv')).toHaveClass(/done/);
-  await expect(toast(page)).toHaveText(/পুরা অধ্যায় শেষ/);
+  expect(CHAPTERS.find((c) => c.id === 'tv').done).toContain(await toast(page).innerText());
 });
 
 test('passing halfway offers tea', async ({ page }) => {

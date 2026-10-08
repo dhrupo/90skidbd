@@ -9,7 +9,7 @@ async function tickAndReveal(page, n) {
   await page.getByTestId('submit-bar').getByRole('button').click();
 }
 
-test('share sheet receives a 1080x1350 PNG of the result', async ({ page }) => {
+test('"more" opens the share sheet with the 1080x1350 marksheet and my challenge link', async ({ page }) => {
   await page.addInitScript(() => {
     navigator.canShare = () => true;
     navigator.share = async ({ files, text }) => {
@@ -19,20 +19,20 @@ test('share sheet receives a 1080x1350 PNG of the result', async ({ page }) => {
   });
   await page.goto('/');
   await tickAndReveal(page, 10);
-  await page.getByRole('button', { name: /পোস্ট মারো/ }).click();
+  await page.getByRole('button', { name: 'আরও অ্যাপে শেয়ার' }).click();
   await expect.poll(() => page.evaluate(() => window.__shared?.type)).toBe('image/png');
   const head = Buffer.from(await page.evaluate(() => window.__shared.bytes));
   expect(pngSize(head)).toEqual({ w: 1080, h: 1350 });
-  expect(await page.evaluate(() => window.__shared.text)).toContain('localhost:4173');
+  expect(await page.evaluate(() => window.__shared.text)).toMatch(/localhost:4173\/#c=/);
 });
 
-test('without a share sheet the PNG downloads instead', async ({ page }) => {
+test('without a share sheet, "more" downloads the PNG instead', async ({ page }) => {
   await page.addInitScript(() => { delete Navigator.prototype.share; delete Navigator.prototype.canShare; });
   await page.goto('/');
   await tickAndReveal(page, 5);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: /পোস্ট মারো/ }).click(),
+    page.getByRole('button', { name: 'আরও অ্যাপে শেয়ার' }).click(),
   ]);
   expect(download.suggestedFilename()).toMatch(/\.png$/);
   await expect(page.getByRole('status')).toContainText('চেপে ধরে');
@@ -71,7 +71,7 @@ test('the marksheet preview sits under the name box and redraws as you type', as
   await expect.poll(() => preview.evaluate((img) => img.naturalWidth)).toBe(1080);
 });
 
-test('the post button waits until the marksheet is ready, then shares at once', async ({ page }) => {
+test('the picture buttons wait until the marksheet is ready, then share at once', async ({ page }) => {
   await page.route('**/photos/*.webp', async (route) => {
     await new Promise((r) => setTimeout(r, 1500));
     await route.continue();
@@ -83,11 +83,44 @@ test('the post button waits until the marksheet is ready, then shares at once', 
   await page.goto('/');
   await page.locator('.card').first().click();
   await page.getByTestId('submit-bar').getByRole('button').click();
-  const post = page.getByRole('button', { name: /পোস্ট মারো/ });
+  const post = page.getByRole('button', { name: 'আরও অ্যাপে শেয়ার' });
   await expect(post).toBeDisabled();
   await expect(post).toBeEnabled({ timeout: 15000 });
   const clickedAt = await page.evaluate(() => performance.now());
   await post.click();
   await expect.poll(() => page.evaluate(() => window.__file)).toBe('image/png');
   expect(await page.evaluate(() => window.__sharedAt) - clickedAt).toBeLessThan(500);
+});
+
+test('save always downloads the marksheet', async ({ page }) => {
+  await page.goto('/');
+  await tickAndReveal(page, 4);
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'ছবি সেভ করো' }).click(),
+  ]);
+  expect(pngSize(fs.readFileSync(await download.path()))).toEqual({ w: 1080, h: 1350 });
+});
+
+test('Instagram hands the marksheet picture to the share sheet', async ({ page }) => {
+  await page.addInitScript(() => {
+    navigator.canShare = () => true;
+    navigator.share = async ({ files }) => { window.__ig = files[0].type; };
+  });
+  await page.goto('/');
+  await tickAndReveal(page, 4);
+  await page.getByRole('button', { name: 'ইনস্টাগ্রামে শেয়ার' }).click();
+  await expect.poll(() => page.evaluate(() => window.__ig)).toBe('image/png');
+});
+
+test('without a share sheet, Instagram saves the picture and says what to do next', async ({ page }) => {
+  await page.addInitScript(() => { delete Navigator.prototype.share; delete Navigator.prototype.canShare; });
+  await page.goto('/');
+  await tickAndReveal(page, 4);
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'ইনস্টাগ্রামে শেয়ার' }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/\.png$/);
+  await expect(page.getByRole('status')).toContainText('ইনস্টাগ্রাম');
 });

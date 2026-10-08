@@ -202,20 +202,24 @@ export async function drawShare(ticked, name = '') {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
-export async function shareImage(blob) {
-  const file = new File([blob], 'nobboiyer-shishu.png', { type: 'image/png' });
-  if (navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], text: `আমি কতটা নব্বইয়ের, দেখো 😎 তুমি কয়টা পারো? ${location.host}` });
-    } catch (e) {
-      if (e.name !== 'AbortError') throw e;
-    }
-    return 'shared';
-  }
+export function saveImage(blob) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = file.name;
+  a.download = 'nobboiyer-shishu.png';
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  return 'downloaded';
+}
+
+export async function shareImage(blob, text) {
+  const file = new File([blob], 'nobboiyer-shishu.png', { type: 'image/png' });
+  if (!navigator.canShare?.({ files: [file] })) {
+    saveImage(blob);
+    return 'downloaded';
+  }
+  try {
+    await navigator.share(text ? { files: [file], text } : { files: [file] });
+  } catch (e) {
+    if (e.name !== 'AbortError') throw e;
+  }
+  return 'shared';
 }

@@ -352,8 +352,6 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .versus strong { display: block; font: 800 20px/1.3 var(--display); }
 .versus p { margin: 6px 0 0; }
 
-.challenge { margin-top: 40px; display: grid; gap: 8px; }
-.challenge h3 { font: 700 15px var(--body); }
 .name-label { display: block; margin-top: 12px; font: 400 13px var(--body); color: var(--muted); }
 #sender {
   display: block;
@@ -368,8 +366,41 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
   font: 400 16px var(--body);
 }
 #sender::placeholder { color: var(--muted); }
-.btn-red { margin-top: 4px; background: var(--card); color: var(--red); border: 2px solid var(--red); box-shadow: 3px 3px 0 var(--red); }
-.btn-red.copied { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
+.socials-title { margin: 4px 0 12px; font: 700 15px var(--body); }
+.socials { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
+.socials button {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 12px var(--body);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.socials .ico {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: transform .09s ease-out, box-shadow .09s ease-out;
+}
+.socials .ico svg { width: 24px; height: 24px; }
+.socials button:active .ico { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.socials button:disabled { cursor: progress; opacity: .5; }
+.ico.fb { background: #1877F2; }
+.ico.ig { background: radial-gradient(circle at 30% 107%, #FDCB52 0%, #FD5949 45%, #D6249F 60%, #285AEB 90%); }
+.ico.xx { background: #000; }
+.ico.wa { background: #1DA851; }
+.ico.more { background: var(--blue); }
+.ico.save { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
 
 .footer { max-width: 480px; margin-inline: auto; padding: 20px 20px calc(96px + env(safe-area-inset-bottom, 0px)); background: var(--paper-deep); font-size: 13px; color: var(--muted); }
 .footer p { margin: 0; }

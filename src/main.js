@@ -1,6 +1,6 @@
 import { CHAPTERS, ITEMS, REMARKS, UNTICK, WARNINGS } from './items.js';
 import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } from './score.js';
-import { drawShare, shareImage } from './share.js';
+import { drawShare, saveImage, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
@@ -156,55 +156,56 @@ senderEl.addEventListener('input', () => {
   clearTimeout(nameTimer);
   nameTimer = setTimeout(updatePreview, 250);
 });
-const shareBtn = document.getElementById('share-btn');
+const pictureBtns = document.querySelectorAll('[data-share="instagram"], [data-share="more"], [data-share="save"]');
 let shareBlob = null;
 let drawing = 0;
 
 async function updatePreview() {
   const mine = ++drawing;
   shareBlob = null;
-  shareBtn.disabled = true;
+  pictureBtns.forEach((b) => { b.disabled = true; });
   const blob = await drawShare(new Set(ticked), senderEl.value);
   if (mine !== drawing) return;
   shareBlob = blob;
-  shareBtn.disabled = false;
+  pictureBtns.forEach((b) => { b.disabled = false; });
   const old = preview.src;
   preview.src = URL.createObjectURL(blob);
   preview.hidden = false;
   if (old) URL.revokeObjectURL(old);
 }
 
-shareBtn.addEventListener('click', async () => {
+const challengeUrl = () => location.origin + location.pathname + packChallenge(ITEMS.map((it) => ticked.has(it.id)), senderEl.value);
+const brag = () => `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
+const enc = encodeURIComponent;
+const LINKS = {
+  facebook: () => `https://www.facebook.com/sharer/sharer.php?u=${enc(challengeUrl())}`,
+  x: () => `https://x.com/intent/tweet?text=${enc(brag())}&url=${enc(challengeUrl())}`,
+  whatsapp: () => `https://wa.me/?text=${enc(`${brag()} ${challengeUrl()}`)}`,
+};
+
+document.querySelector('.socials').addEventListener('click', async (e) => {
+  const kind = e.target.closest('[data-share]')?.dataset.share;
+  if (!kind) return;
+  if (LINKS[kind]) {
+    window.open(LINKS[kind](), '_blank', 'noopener');
+    return;
+  }
   if (!shareBlob) return;
+  if (kind === 'save') {
+    saveImage(shareBlob);
+    toast('ছবি সেভ হইছে 📥');
+    return;
+  }
   try {
-    const how = await shareImage(shareBlob);
-    if (how === 'downloaded') toast('ছবি সেভ হইছে। না হলে উপরের ছবিটা চেপে ধরে সেভ করো 👆');
+    const how = await shareImage(shareBlob, kind === 'more' ? `${brag()} ${challengeUrl()}` : '');
+    if (how === 'downloaded') {
+      toast(kind === 'instagram'
+        ? 'ছবি সেভ হইছে 📸 এখন ইনস্টাগ্রাম খুলে স্টোরি দাও'
+        : 'ছবি সেভ হইছে। না হলে উপরের ছবিটা চেপে ধরে সেভ করো 👆');
+    }
   } catch {
     toast('শেয়ার হইল না 😕 আবার চাপো তো');
   }
-});
-
-const challengeBtn = document.getElementById('challenge-btn');
-document.getElementById('challenge').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const name = senderEl.value;
-  const url = location.origin + location.pathname + packChallenge(ITEMS.map((it) => ticked.has(it.id)), name);
-  const text = `আমি ${bn(percent(ticked.size, TOTAL))}% পাইছি 😎 দেখি তুমি কয়টা পারো?`;
-  try {
-    if (navigator.share) await navigator.share({ url, text });
-    else await navigator.clipboard.writeText(`${text} ${url}`);
-  } catch (err) {
-    if (err.name === 'AbortError') return;
-    toast('লিংক কপি হইল না 😕 আবার চাপো তো');
-    return;
-  }
-  challengeBtn.classList.add('copied');
-  challengeBtn.textContent = 'লিংক রেডি ✓';
-  toast('এবার বন্ধুর ইনবক্সে ছুঁড়ে মারো 😈');
-  setTimeout(() => {
-    challengeBtn.classList.remove('copied');
-    challengeBtn.innerHTML = 'দেখি ও কয়টা পারে <span aria-hidden="true">🥊</span>';
-  }, 2500);
 });
 
 submitBtn.addEventListener('click', () => {
