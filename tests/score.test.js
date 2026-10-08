@@ -21,28 +21,29 @@ test('each score band gets its title, edges included', () => {
 
 import { packChallenge, unpackChallenge } from '../src/score.js';
 
-const sample = Array.from({ length: 48 }, (_, i) => i % 3 === 0);
+const sample = Array.from({ length: 60 }, (_, i) => i % 3 === 0);
 
-test('a challenge link carries the same 48 ticks and name back', () => {
+test('a challenge link carries the same 60 ticks and name back in 11 characters', () => {
   const hash = packChallenge(sample, 'রাফি');
-  assert.deepEqual(unpackChallenge(hash), { ticks: sample, name: 'রাফি' });
+  assert.equal(new URLSearchParams(hash.slice(1)).get('c').length, 11);
+  assert.deepEqual(unpackChallenge(hash, 60), { ticks: sample, name: 'রাফি' });
 });
 
 test('a challenge without a name unpacks with an empty name', () => {
-  assert.deepEqual(unpackChallenge(packChallenge(sample, '')), { ticks: sample, name: '' });
+  assert.deepEqual(unpackChallenge(packChallenge(sample, ''), 60), { ticks: sample, name: '' });
 });
 
 test('garbage or missing challenge data means no challenge', () => {
   for (const bad of ['', '#', '#c=', '#c=!!!!', '#c=AAAA', '#foo=bar', '#c=%E0%A4']) {
-    assert.equal(unpackChallenge(bad), null, bad);
+    assert.equal(unpackChallenge(bad, 60), null, bad);
   }
 });
 
 test('the sender name is cut to 20 characters', () => {
   const long = 'অ'.repeat(30);
-  assert.equal(unpackChallenge(packChallenge(sample, long)).name, 'অ'.repeat(20));
+  assert.equal(unpackChallenge(packChallenge(sample, long), 60).name, 'অ'.repeat(20));
   const forged = packChallenge(sample, '').replace(/$/, '&n=' + encodeURIComponent('ক'.repeat(50)));
-  assert.equal(unpackChallenge(forged).name, 'ক'.repeat(20));
+  assert.equal(unpackChallenge(forged, 60).name, 'ক'.repeat(20));
 });
 
 import { compare } from '../src/score.js';
@@ -61,17 +62,21 @@ test('numbers are written in Bangla digits', () => {
   assert.equal(bn('৩২/48'), '৩২/৪৮');
 });
 
-test('a link made with 48 items still works after items are added', () => {
+test('a link made with 60 items still works after items are added', () => {
   const old = packChallenge(sample, 'রাফি');
-  const now = unpackChallenge(old, 56);
+  const now = unpackChallenge(old, 68);
   assert.deepEqual(now.ticks, [...sample, ...Array(8).fill(false)]);
   assert.equal(now.name, 'রাফি');
 });
 
 test('a link longer than today\'s list is rejected', () => {
-  assert.equal(unpackChallenge(packChallenge(Array(56).fill(true), ''), 48), null);
+  assert.equal(unpackChallenge(packChallenge(Array(68).fill(true), ''), 60), null);
+});
+
+test('a link shorter than the launch list is rejected', () => {
+  assert.equal(unpackChallenge(packChallenge(Array(48).fill(true), ''), 60), null);
 });
 
 test('hidden direction-flipping characters are stripped from names', () => {
-  assert.equal(unpackChallenge(packChallenge(sample, 'রা‮ফি⁦')).name, 'রাফি');
+  assert.equal(unpackChallenge(packChallenge(sample, 'রা‮ফি⁦'), 60).name, 'রাফি');
 });

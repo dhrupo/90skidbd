@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { packChallenge, unpackChallenge } from '../../src/score.js';
 
-const firstN = (n) => Array.from({ length: 48 }, (_, i) => i < n);
+const firstN = (n) => Array.from({ length: 60 }, (_, i) => i < n);
 
 test('sender gets a challenge link carrying their ticks and name', async ({ page }) => {
   await page.addInitScript(() => {
@@ -25,10 +25,10 @@ test('receiver plays, then sees how they compare with the sender', async ({ page
   for (let i = 0; i < 30; i++) await cards.nth(i).click();
   await page.getByTestId('submit-bar').getByRole('button').click();
   const vs = page.getByTestId('versus');
-  await expect(vs).toContainText('তুমি ৬৩%');
-  await expect(vs).toContainText('রাফি ৭৫%');
+  await expect(vs).toContainText('তুমি ৫০%');
+  await expect(vs).toContainText('রাফি ৬০%');
   await expect(vs).toContainText('দুজনেরই মনে আছে ৩০টা');
-  await expect(vs).toContainText('লুডুতে ঝগড়া');
+  await expect(vs).toContainText('ঘুড়ি কাটাকাটি');
 });
 
 test('a booby-trapped name is shown as plain text and never runs', async ({ page }) => {
@@ -48,7 +48,7 @@ test('a broken challenge link just starts a normal game', async ({ page }) => {
   await page.goto('/#c=!!!!&n=x');
   await expect(page.getByTestId('challenge-banner')).toBeHidden();
   await page.locator('.card').first().click();
-  await expect(page.getByTestId('counter')).toHaveText('১/৪৮');
+  await expect(page.getByTestId('counter')).toHaveText('১/৬০');
 });
 
 test('the challenge survives tapping the intro button and reloading', async ({ page }) => {

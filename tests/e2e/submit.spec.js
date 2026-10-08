@@ -14,7 +14,7 @@ test('the submit bar appears only after the first tick', async ({ page }) => {
   await expect(bar(page)).toBeHidden();
   await page.locator('.card').first().click();
   await expect(bar(page)).toBeVisible();
-  await expect(bar(page)).toContainText('১/৪৮');
+  await expect(bar(page)).toContainText('১/৬০');
   await expect(bar(page).getByRole('button')).toHaveText(/রেজাল্ট দেখাও/);
   await page.locator('.card').first().click();
   await expect(bar(page)).toBeHidden();
@@ -27,7 +27,7 @@ async function tick(page, n) {
 
 test('the button opens a pop-up report card with share and challenge', async ({ page }) => {
   await page.goto('/');
-  await tick(page, 32);
+  await tick(page, 40);
   await bar(page).getByRole('button').click();
   const dialog = page.getByRole('dialog', { name: /রেজাল্ট বের হইছে/ });
   await expect(dialog).toBeVisible();
@@ -69,7 +69,7 @@ for (const [name, label] of [
   ['', 'বন্ধুর সাথে মিলাও'],
 ]) {
   test(`a challenge from "${name || 'no name'}" labels the button "${label}"`, async ({ page }) => {
-    await page.goto('/' + packChallenge(Array(48).fill(true), name));
+    await page.goto('/' + packChallenge(Array(60).fill(true), name));
     await page.locator('.card').first().click();
     await expect(bar(page).getByRole('button')).toHaveText(new RegExp(label));
   });
@@ -88,7 +88,7 @@ test('the marking scheme stays folded until tapped', async ({ page }) => {
 test('with reduce-motion the pop-up shows the final score at once', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  await tick(page, 12);
+  await tick(page, 15);
   await bar(page).getByRole('button').click();
   await expect(dialogOf(page).getByTestId('score')).toHaveText('২৫%', { timeout: 200 });
   expect(await dialogOf(page).evaluate((d) => getComputedStyle(d).animationName)).toBe('none');

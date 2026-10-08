@@ -5,16 +5,16 @@ const counter = (page) => page.getByTestId('counter');
 
 test('tapping a memory ticks it, tapping again unticks it', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#chapters').getByRole('button', { pressed: false })).toHaveCount(48);
-  await expect(counter(page)).toHaveText('০/৪৮');
+  await expect(page.locator('#chapters').getByRole('button', { pressed: false })).toHaveCount(60);
+  await expect(counter(page)).toHaveText('০/৬০');
 
   await card(page, 'আলিফ লায়লা').click();
   await expect(card(page, 'আলিফ লায়লা')).toHaveAttribute('aria-pressed', 'true');
-  await expect(counter(page)).toHaveText('১/৪৮');
+  await expect(counter(page)).toHaveText('১/৬০');
 
   await card(page, 'আলিফ লায়লা').click();
   await expect(card(page, 'আলিফ লায়লা')).toHaveAttribute('aria-pressed', 'false');
-  await expect(counter(page)).toHaveText('০/৪৮');
+  await expect(counter(page)).toHaveText('০/৬০');
 });
 
 test('ticks survive a page reload', async ({ page }) => {
@@ -24,7 +24,7 @@ test('ticks survive a page reload', async ({ page }) => {
   await page.reload();
   await expect(card(page, 'মিমি চকলেট')).toHaveAttribute('aria-pressed', 'true');
   await expect(card(page, 'লুডুতে ঝগড়া')).toHaveAttribute('aria-pressed', 'true');
-  await expect(counter(page)).toHaveText('২/৪৮');
+  await expect(counter(page)).toHaveText('২/৬০');
 });
 
 for (const [label, saved] of [
@@ -36,9 +36,23 @@ for (const [label, saved] of [
   test(`bad saved ticks (${label}) never break the page`, async ({ page }) => {
     await page.addInitScript((v) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('90skid-ticks', v); sessionStorage.setItem('seeded', '1'); } }, saved);
     await page.goto('/');
-    await expect(page.locator('#chapters .card')).toHaveCount(48);
+    await expect(page.locator('#chapters .card')).toHaveCount(60);
     const pressed = await page.locator('#chapters .card[aria-pressed="true"]').count();
-    await expect(page.getByTestId('counter')).toHaveText(`${'০১২৩'[pressed]}/৪৮`);
+    await expect(page.getByTestId('counter')).toHaveText(`${'০১২৩'[pressed]}/৬০`);
     await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 }
+
+test('every chapter has 10 cards and every photo loads', async ({ page }) => {
+  const missing = [];
+  page.on('response', (r) => { if (r.url().includes('/photos/') && !r.ok()) missing.push(r.url()); });
+  await page.goto('/');
+  for (const ch of ['tv', 'tiffin', 'school', 'khela', 'gadget', 'eid']) {
+    await expect(page.locator(`#ch-${ch} .card`)).toHaveCount(10);
+  }
+  for (const img of await page.locator('.card img').all()) {
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth)).toBeGreaterThan(0);
+  }
+  expect(missing).toEqual([]);
+});

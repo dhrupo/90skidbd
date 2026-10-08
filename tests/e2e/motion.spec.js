@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { UNTICK } from '../../src/items.js';
 
 const toast = (page) => page.getByRole('status');
 
@@ -7,14 +8,14 @@ test('unticking shows a kind little toast', async ({ page }) => {
   const card = page.locator('.card').first();
   await card.click();
   await card.click();
-  await expect(toast(page)).toHaveText(/ভুল হইতেই পারে/);
+  expect(UNTICK).toContain(await toast(page).innerText());
 });
 
 test('finishing a chapter stamps full marks', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('#ch-tv .card');
-  for (let i = 0; i < 8; i++) await cards.nth(i).click();
-  await expect(page.locator('#ch-tv .chapter-count')).toHaveText('৮/৮');
+  for (let i = 0; i < 10; i++) await cards.nth(i).click();
+  await expect(page.locator('#ch-tv .chapter-count')).toHaveText('১০/১০');
   await expect(page.locator('#ch-tv')).toHaveClass(/done/);
   await expect(toast(page)).toHaveText(/পুরা অধ্যায় শেষ/);
 });
@@ -22,7 +23,7 @@ test('finishing a chapter stamps full marks', async ({ page }) => {
 test('passing halfway offers tea', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('.card');
-  for (let i = 0; i < 24; i++) await cards.nth(i).click();
+  for (let i = 0; i < 30; i++) await cards.nth(i).click();
   await expect(toast(page)).toHaveText(/অর্ধেক শেষ/);
 });
 

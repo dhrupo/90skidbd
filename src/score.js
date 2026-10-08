@@ -10,7 +10,7 @@ export const percent = (ticked, total) => Math.round((ticked / total) * 100);
 export const tier = (pct) => TIERS.find((t) => pct <= t.max);
 
 const NAME_MAX = 20;
-const LAUNCH_ITEMS = 48;
+const LAUNCH_ITEMS = 60;
 const codeLength = (items) => Math.ceil(Math.ceil(items / 8) * 4 / 3);
 const cutName = (name) => Array.from((name || '').replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '').trim()).slice(0, NAME_MAX).join('');
 
@@ -22,7 +22,7 @@ export function packChallenge(ticks, name) {
   return `#c=${code}` + (n ? `&n=${encodeURIComponent(n)}` : '');
 }
 
-export function unpackChallenge(hash, total = 48) {
+export function unpackChallenge(hash, total = LAUNCH_ITEMS) {
   const params = new URLSearchParams((hash || '').replace(/^#/, ''));
   const code = params.get('c') || '';
   if (!/^[A-Za-z0-9_-]+$/.test(code) || code.length % 4 === 1) return null;

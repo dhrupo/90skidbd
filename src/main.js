@@ -1,9 +1,10 @@
-import { CHAPTERS, ITEMS } from './items.js';
+import { CHAPTERS, ITEMS, UNTICK, WARNINGS } from './items.js';
 import { bn, compare, packChallenge, percent, tier, TIERS, unpackChallenge } from './score.js';
 import { drawShare, shareImage } from './share.js';
 
 const STORE = '90skid-ticks';
 const TOTAL = ITEMS.length;
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const ticked = new Set(load());
 const CHALLENGE = '90skid-challenge';
 const challenger = unpackChallenge(location.hash, TOTAL) || unpackChallenge(sessionGet(CHALLENGE), TOTAL);
@@ -44,7 +45,7 @@ document.getElementById('chapters').innerHTML = CHAPTERS.map((c, i) => `
   <section class="chapter" id="ch-${c.id}" aria-labelledby="h-${c.id}">
     <p class="chapter-kicker">অধ্যায় ${bn(i + 1)}</p>
     <div class="chapter-head">
-      <div><h2 id="h-${c.id}">${c.title}</h2><p class="aside">${c.aside}</p></div>
+      <div><h2 id="h-${c.id}">${c.title}</h2><p class="aside">${pick(c.asides)}</p></div>
       <span class="chapter-count" data-count="${c.id}"></span>
     </div>
     <div class="cards">${ITEMS.filter((it) => it.chapter === c.id).map(cardHtml).join('')}</div>
@@ -54,6 +55,7 @@ const counter = document.querySelector('[data-testid="counter"]');
 const toastEl = document.querySelector('.toast');
 let toastTimer;
 let halfwayShown = false;
+const pepShown = new Set();
 
 function toast(text) {
   toastEl.textContent = text;
@@ -81,7 +83,7 @@ function remark(pct, missed) {
   if (pct === 100) return 'সব মনে আছে?! তুমি তো চলমান জাদুঘর 🏛️' + sign;
   if (pct <= 25) return 'এগুলা তোমার আব্বা-আম্মুর জিনিস, বুঝছি। তুমি টিকটক দেখো 😌' + sign;
   if (pct <= 50) return 'অর্ধেক মনে আছে, বাকি অর্ধেক ইউটিউবে দেখছো। ঠিক বলছি না?' + sign;
-  if (pct <= 80) return `খারাপ না! কিন্তু ${bn(missed)}টা ভুলে গেলা কেমনে? আম্মুকে একটা ফোন দাও।` + sign;
+  if (pct <= 80) return `খারাপ না! কিন্তু ${bn(missed)}টা ভুলে গেলা কেমনে? কালকে আম্মুকে নিয়ে স্কুলে আসবে।` + sign;
   return `${bn(missed)}টা মিস? চলো মাফ করলাম, বিটিভির লোগো বলে কথা!` + sign;
 }
 
@@ -258,19 +260,24 @@ document.getElementById('chapters').addEventListener('click', (e) => {
       replay(tick, 'erasing');
       setTimeout(() => tick.classList.remove('erasing'), 200);
     }
-    toast('আচ্ছা, ভুল হইতেই পারে 😅');
+    toast(pick(UNTICK));
     return;
   }
   card.querySelector('.tick').classList.remove('erasing');
   const chapter = CHAPTERS.find((c) => c.id === ITEMS.find((it) => it.id === id).chapter);
   if (chapterDone(chapter)) replay(document.getElementById(`ch-${chapter.id}`), 'stamped');
+  const inChapter = ITEMS.filter((it) => it.chapter === chapter.id && ticked.has(it.id)).length;
   if (ticked.size === TOTAL / 2 && !halfwayShown) {
     halfwayShown = true;
     toast('অর্ধেক শেষ! চা খাবা? ☕');
   } else if (chapterDone(chapter)) {
     toast(chapter.done);
+  } else if (inChapter === 3 && !pepShown.has(chapter.id)) {
+    pepShown.add(chapter.id);
+    toast(pick(chapter.pep));
   }
 });
 
 render();
 document.querySelector('.footer').hidden = false;
+document.querySelector('.margin-note').textContent = '↳ ' + pick(WARNINGS);

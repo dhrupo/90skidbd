@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('footer has the photo-removal email and the tiny credit', async ({ page }) => {
   await page.goto('/');
   const footer = page.getByRole('contentinfo');
-  await expect(footer).toContainText('hello@90skidbd.com');
+  await expect(footer).toContainText('dhrupo@gmail.com');
   await expect(footer).toContainText('made by dhrupo');
 });
 

@@ -20,6 +20,6 @@ test('the page does not jump around while it loads on a slow network', async ({ 
     }).observe({ type: 'layout-shift', buffered: true });
   });
   await page.goto('/');
-  await expect(page.locator('.card')).toHaveCount(48);
+  await expect(page.locator('.card')).toHaveCount(60);
   expect(await page.evaluate(() => window.__cls)).toBeLessThan(0.1);
 });
