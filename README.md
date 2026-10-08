@@ -78,15 +78,13 @@ This needs macOS `sips` and `cwebp`.
 
 > **Item order matters.** Challenge links store ticks by position. Once the site is live, only **add** new items at the end. Don't reorder or remove items, or old challenge links will point at the wrong memories.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare)
 
-Connect this repo in Cloudflare Pages:
-- Production branch: `main`
-- Framework preset: None
-- Build command: *(empty)*
-- Output directory: `/`
+The repo is connected to Cloudflare Workers Builds. Each push to `main` runs `npx wrangler deploy`, which serves the site as static assets using `wrangler.jsonc`.
+- `.assetsignore` keeps everything except the site out of the upload, so only `index.html`, `src/`, `photos/` and `og.png` go live. Add any new non-site files or folders there.
+- Check what would upload with `npx wrangler deploy --dry-run`.
 
-The Facebook preview tags in `index.html` point to `https://90skidbd.pages.dev/`. Update `og:url` and `og:image` there if the site moves to its own domain. The marksheet and share text print the current address on their own.
+The Facebook preview tags (`og:url`, `og:image`) in `index.html` must hold the live address. Update them when the address changes. The marksheet and share text print the current address on their own.
 
 ## Photo removal
 

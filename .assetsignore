@@ -1,0 +1,15 @@
+.git
+.gitignore
+.assetsignore
+.wrangler
+.DS_Store
+node_modules
+tests
+test-results
+playwright-report
+scripts
+package.json
+package-lock.json
+playwright.config.js
+wrangler.jsonc
+README.md
