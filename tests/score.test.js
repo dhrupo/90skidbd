@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { percent, tier } from '../src/score.js';
+import { percent, tier, TIERS } from '../src/score.js';
 
 test('32 of 48 remembered rounds to 67%', () => {
   assert.equal(percent(32, 48), 67);
@@ -8,15 +8,11 @@ test('32 of 48 remembered rounds to 67%', () => {
   assert.equal(percent(48, 48), 100);
 });
 
-test('each score band gets its title, edges included', () => {
-  assert.equal(tier(0).title, '২০০০-এর পরের বাচ্চা');
-  assert.equal(tier(25).title, '২০০০-এর পরের বাচ্চা');
-  assert.equal(tier(26).title, 'আধা নব্বই, আধা ইউটিউব');
-  assert.equal(tier(50).title, 'আধা নব্বই, আধা ইউটিউব');
-  assert.equal(tier(51).title, 'পাক্কা নব্বইয়ের পোলাপান');
-  assert.equal(tier(80).title, 'পাক্কা নব্বইয়ের পোলাপান');
-  assert.equal(tier(81).title, 'বিটিভির লোগো তুমি নিজেই');
-  assert.equal(tier(100).title, 'বিটিভির লোগো তুমি নিজেই');
+test('scores follow the SSC grade scale, edges included', () => {
+  const cases = [[0, 'F'], [32, 'F'], [33, 'D'], [39, 'D'], [40, 'C'], [49, 'C'], [50, 'B'], [59, 'B'],
+    [60, 'A-'], [69, 'A-'], [70, 'A'], [79, 'A'], [80, 'A+'], [100, 'A+']];
+  for (const [pct, grade] of cases) assert.equal(tier(pct).grade, grade, `${pct}%`);
+  assert.equal(new Set(TIERS.map((t) => t.title)).size, 7);
 });
 
 import { packChallenge, unpackChallenge } from '../src/score.js';

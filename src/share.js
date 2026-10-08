@@ -24,8 +24,6 @@ function drawCover(ctx, img, x, y, w, h) {
   ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h);
 }
 
-const GRADES = [[10, 'A+'], [8, 'A'], [6, 'B'], [4, 'C'], [2, 'D'], [0, 'F']];
-const grade = (n) => GRADES.find(([min]) => n >= min)[1];
 const RING = new Path2D('M60 8c30 1 52 22 52 52s-23 52-53 51C29 110 8 89 9 59 10 31 31 10 64 9');
 
 function text(ctx, str, x, y, font, color, align = 'left') {
@@ -122,13 +120,13 @@ export async function drawShare(ticked, name = '') {
         ctx.fillRect(bx + 4, y + 21, 18, 18);
       }
     });
-    const g = grade(n);
+    const g = tier(percent(n, items.length)).grade;
     text(ctx, g, tx + tw - 50, y + 45, '400 40px Atma', g === 'F' ? C.red : '#1E7B34', 'center');
     y += 62;
   }
 
   y += 20;
-  text(ctx, `মোট: ${bn(total)}/${bn(ITEMS.length)}`, tx + 20, y + 40, '800 40px "Baloo Da 2"', C.ink);
+  text(ctx, `মোট: ${bn(total)}/${bn(ITEMS.length)}  ·  গ্রেড ${t.grade}`, tx + 20, y + 40, '800 40px "Baloo Da 2"', C.ink);
   text(ctx, 'মন্তব্য:', tx + 20, y + 96, '700 28px "Hind Siliguri"', C.muted);
   text(ctx, `${t.title} ${t.emoji}`, tx + 120, y + 96, fitFont(ctx, `${t.title} ${t.emoji}`, 400, 'Atma', 38, 520), C.red);
 
@@ -179,7 +177,7 @@ export async function drawShare(ticked, name = '') {
   ctx.fillRect(tx + 10, y + 14, 290, 2);
   text(ctx, 'প্রধান শিক্ষক', tx + 155, y + 46, '600 26px "Hind Siliguri"', C.muted, 'center');
 
-  const pass = pct > 25;
+  const pass = t.grade !== 'F';
   ctx.save();
   ctx.translate(W - PAD - 120, y - 14);
   ctx.rotate(-0.22);

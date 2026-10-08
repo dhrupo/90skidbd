@@ -80,7 +80,7 @@ let closedOnce = false;
 
 function remark(pct, missed) {
   if (pct === 0) return 'আগে উপরে কিছু টিক দাও, তারপর রেজাল্ট 😑';
-  const band = pct === 100 ? 'full' : pct > 80 ? 'great' : pct > 50 ? 'good' : pct > 25 ? 'half' : 'low';
+  const band = pct === 100 ? 'full' : tier(pct).grade;
   return pick(REMARKS[band]).replaceAll('{n}', bn(missed)).replaceAll('{total}', bn(TOTAL)) + ' — ক্লাস টিচার';
 }
 
@@ -129,10 +129,13 @@ function renderResult() {
   const pct = percent(ticked.size, TOTAL);
   const t = tier(pct);
   result.querySelector('.result-count').textContent = `${bn(TOTAL)}টার মধ্যে ${bn(ticked.size)}টা চিনছো`;
-  result.querySelector('.rank').textContent = `${t.title} ${t.emoji}`;
+  const badge = document.createElement('span');
+  badge.className = 'grade';
+  badge.textContent = t.grade;
+  result.querySelector('.rank').replaceChildren(badge, ` ${t.title} ${t.emoji}`);
   result.querySelector('.remark').textContent = remark(pct, TOTAL - ticked.size);
   document.getElementById('scheme').innerHTML = TIERS.map((x) =>
-    `<tr${x === t ? ' class="you"' : ''}><td>${x.range}</td><td>${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
+    `<tr${x === t ? ' class="you"' : ''}><td>${x.range}</td><td><b>${x.grade}</b> ${x.title} ${x.emoji}${x === t ? '<span class="you-mark">← তুমি</span>' : ''}</td></tr>`).join('');
   renderVersus(pct);
 }
 

@@ -32,7 +32,7 @@ test('the button opens a pop-up report card with share and challenge', async ({ 
   const dialog = page.getByRole('dialog', { name: /রেজাল্ট বের হইছে/ });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByTestId('score')).toHaveText('৬৭%');
-  await expect(dialog.getByTestId('rank')).toContainText('পাক্কা নব্বইয়ের পোলাপান');
+  await expect(dialog.getByTestId('rank')).toContainText('নব্বইয়ের ভালো ছাত্র');
   await expect.poll(() => dialog.getByRole('img', { name: /মার্কশিট/ }).evaluate((img) => img.naturalWidth)).toBe(1080);
   await expect(dialog.getByRole('button', { name: 'ফেসবুকে শেয়ার' })).toBeVisible();
   await expect(dialog.getByLabel('তোমার নাম')).toBeVisible();

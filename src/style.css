@@ -305,6 +305,7 @@ h1 { font-size: clamp(28px, 8vw, 34px); margin-top: 28px; text-wrap: balance; }
 .score-ring span { font: 800 34px/1 var(--display); color: var(--red); font-variant-numeric: tabular-nums; }
 .result-count { margin: 0; font-size: 14px; color: var(--muted); }
 .rank { margin: 2px 0 0; font: 800 22px/1.25 var(--display); }
+.grade { display: inline-block; margin-right: 4px; padding: 0 8px; border: 2px solid var(--red); border-radius: 999px; font: 400 18px/1.4 var(--hand); color: var(--red); transform: rotate(-4deg); vertical-align: 2px; }
 .remark { margin: 16px 0 0; padding-top: 14px; border-top: 1.5px solid #9FB9D1; font: 400 15px/1.5 var(--hand); color: var(--red); min-height: 3em; }
 .scheme { width: 100%; border-collapse: collapse; }
 .scheme td { padding: 8px; font: 400 15px var(--hand); border-top: 1px dashed #2B21181F; }

@@ -1,13 +1,16 @@
 export const TIERS = [
-  { max: 25, range: '০–২৫%', title: '২০০০-এর পরের বাচ্চা', emoji: '🍼' },
-  { max: 50, range: '২৬–৫০%', title: 'আধা নব্বই, আধা ইউটিউব', emoji: '📱' },
-  { max: 80, range: '৫১–৮০%', title: 'পাক্কা নব্বইয়ের পোলাপান', emoji: '🎒' },
-  { max: 100, range: '৮১%+', title: 'বিটিভির লোগো তুমি নিজেই', emoji: '📺' },
+  { min: 80, grade: 'A+', range: '৮০–১০০%', title: 'বিটিভির লোগো তুমি নিজেই', emoji: '📺' },
+  { min: 70, grade: 'A', range: '৭০–৭৯%', title: 'পাক্কা নব্বইয়ের পোলাপান', emoji: '🎒' },
+  { min: 60, grade: 'A-', range: '৬০–৬৯%', title: 'নব্বইয়ের ভালো ছাত্র', emoji: '📚' },
+  { min: 50, grade: 'B', range: '৫০–৫৯%', title: 'হাফ-টিফিন নব্বই', emoji: '🍬' },
+  { min: 40, grade: 'C', range: '৪০–৪৯%', title: 'আধা নব্বই, আধা ইউটিউব', emoji: '📱' },
+  { min: 33, grade: 'D', range: '৩৩–৩৯%', title: 'টেনেটুনে পাস', emoji: '😅' },
+  { min: 0, grade: 'F', range: '০–৩২%', title: '২০০০-এর পরের বাচ্চা', emoji: '🍼' },
 ];
 
 export const percent = (ticked, total) => Math.round((ticked / total) * 100);
 
-export const tier = (pct) => TIERS.find((t) => pct <= t.max);
+export const tier = (pct) => TIERS.find((t) => pct >= t.min);
 
 const NAME_MAX = 20;
 const LAUNCH_ITEMS = 60;

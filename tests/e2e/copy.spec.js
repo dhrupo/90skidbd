@@ -77,9 +77,9 @@ test('the contact email is dhrupo@gmail.com', async ({ page }) => {
   await expect(page.getByRole('contentinfo').getByRole('link')).toHaveAttribute('href', 'mailto:dhrupo@gmail.com');
 });
 
-test('every score band has 5 teacher remarks to pick from', () => {
-  for (const band of ['low', 'half', 'good', 'great', 'full']) expect(REMARKS[band]).toHaveLength(5);
-  expect(REMARKS.good.join(' ')).toContain('কালকে আম্মুকে নিয়ে স্কুলে আসবে');
+test('every grade has 5 teacher remarks to pick from', () => {
+  for (const band of ['A+', 'A', 'A-', 'B', 'C', 'D', 'F', 'full']) expect(REMARKS[band]).toHaveLength(5);
+  expect(REMARKS['A-'].join(' ')).toContain('কালকে আম্মুকে নিয়ে স্কুলে আসবে');
 });
 
 test('the teacher remark changes between openings', async ({ page }) => {
@@ -87,7 +87,7 @@ test('the teacher remark changes between openings', async ({ page }) => {
   const cards = page.locator('.card');
   for (let i = 0; i < 40; i++) await cards.nth(i).click();
   const fill = (t) => t.replaceAll('{n}', '২০').replaceAll('{total}', '৬০');
-  const allowed = REMARKS.good.map((t) => fill(t) + ' — ক্লাস টিচার');
+  const allowed = REMARKS['A-'].map((t) => fill(t) + ' — ক্লাস টিচার');
   const seen = new Set();
   for (let i = 0; i < 12; i++) {
     await page.getByTestId('submit-bar').getByRole('button').click();
