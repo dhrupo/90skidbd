@@ -2,9 +2,11 @@
 
 **নব্বইয়ের পোলাপান, নাকি ভুয়া? 🤨**
 
+### ▶ Play it: [90skidbd.dhrupo.workers.dev](https://90skidbd.dhrupo.workers.dev/)
+
 A Bangla nostalgia checklist for people who grew up in 1990s–early 2000s Bangladesh. Tick the memories you remember, get a 90s-style school marksheet, post it on Facebook, and challenge a friend to beat your score.
 
-![নব্বইয়ের শিশু preview](og.png)
+[![নব্বইয়ের শিশু preview](og.png)](https://90skidbd.dhrupo.workers.dev/)
 
 ## How it works
 
@@ -84,7 +86,7 @@ The repo is connected to Cloudflare Workers Builds. Each push to `main` runs `np
 - `.assetsignore` keeps everything except the site out of the upload, so only `index.html`, `src/`, `photos/` and `og.png` go live. Add any new non-site files or folders there.
 - Check what would upload with `npx wrangler deploy --dry-run`.
 
-The Facebook preview tags (`og:url`, `og:image`) in `index.html` must hold the live address. Update them when the address changes. The marksheet and share text print the current address on their own.
+Live at **https://90skidbd.dhrupo.workers.dev/**. The Facebook preview tags (`og:url`, `og:image`) in `index.html` must hold the live address. Update them when the address changes. The marksheet and share text print the current address on their own.
 
 ## Photo removal
 
