@@ -13,7 +13,10 @@ A Bangla nostalgia checklist for people who grew up in 1990s–early 2000s Bangl
 1. **Tick memories.** 60 photo cards in 6 chapters: টিভি, টিফিন, স্কুল, খেলা, গ্যাজেট and ঈদ. Tap a card to give it a green teacher's tick.
 2. **Hand in your khata.** A sticky bar appears after the first tick. Tap it to open the result: a score, a funny title, and the class teacher's remark.
 3. **Get your marksheet.** A 1080×1350 "মার্কশিট" image shows your marks per subject, grades, total, a photo strip and a পাস/ফেল stamp.
-4. **Share and challenge.** Facebook, X and WhatsApp share your score with a challenge link that carries your ticks and name. Instagram, "more" and save use the marksheet picture. A friend who opens the link plays first, then sees how you compare.
+4. **Share and challenge.** Every share carries your challenge link (your ticks and name). A friend who opens it plays first, then sees how you compare.
+   - **Facebook** gets the link, and its preview shows your own wide score card.
+   - **X and WhatsApp on phones** open the share menu with your marksheet **picture** attached, so the picture always shows. On computers they post the link with the score-card preview.
+   - **Instagram, "more" and save** use the marksheet picture.
 
 ### Grades (SSC scale)
 

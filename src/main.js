@@ -161,7 +161,9 @@ senderEl.addEventListener('input', () => {
   clearTimeout(nameTimer);
   nameTimer = setTimeout(updatePreview, 250);
 });
-const pictureBtns = document.querySelectorAll('[data-share="instagram"], [data-share="more"], [data-share="save"]');
+const sharesPictures = matchMedia('(pointer: coarse)').matches
+  && !!navigator.canShare?.({ files: [new File([''], 'card.png', { type: 'image/png' })] });
+const pictureBtns = document.querySelectorAll(`[data-share="instagram"], [data-share="more"], [data-share="save"]${sharesPictures ? ', [data-share="x"], [data-share="whatsapp"]' : ''}`);
 let shareBlob = null;
 let drawing = 0;
 
@@ -207,6 +209,15 @@ const LINKS = {
 document.querySelector('.socials').addEventListener('click', async (e) => {
   const kind = e.target.closest('[data-share]')?.dataset.share;
   if (!kind) return;
+  if (sharesPictures && (kind === 'x' || kind === 'whatsapp')) {
+    if (!shareBlob) return;
+    try {
+      await shareImage(shareBlob, `${brag()} ${challengeUrl()}`);
+    } catch {
+      toast('শেয়ার হইল না 😕 আবার চাপো তো');
+    }
+    return;
+  }
   if (LINKS[kind]) {
     const tab = window.open('about:blank', '_blank');
     const target = LINKS[kind](await cardLink());

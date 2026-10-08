@@ -5,6 +5,8 @@ const firstN = (n) => Array.from({ length: 60 }, (_, i) => i < n);
 
 async function play(page) {
   await page.addInitScript(() => {
+    delete Navigator.prototype.share;
+    delete Navigator.prototype.canShare;
     window.__opened = [];
     window.open = (url) => {
       if (url && url !== 'about:blank') window.__opened.push(url);
@@ -120,4 +122,52 @@ for (const [why, handler] of [
 test('the privacy note about the 7-day picture is shown under the icons', async ({ page }) => {
   const dialog = await play(page);
   await expect(dialog.locator('.privacy-note')).toContainText('৭ দিন');
+});
+
+async function playWithShareSheet(page) {
+  await page.addInitScript(() => {
+    window.__opened = [];
+    window.open = (url) => { if (url !== 'about:blank') window.__opened.push(url); return null; };
+    navigator.canShare = () => true;
+    navigator.share = async ({ files, text }) => { window.__shared = { type: files?.[0]?.type, text }; };
+  });
+  await page.goto('/');
+  const cards = page.locator('.card');
+  for (let i = 0; i < 3; i++) await cards.nth(i).click();
+  await page.getByTestId('submit-bar').getByRole('button').click();
+  await page.getByLabel('তোমার নাম').fill('রাফি');
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('button', { name: 'ছবি সেভ করো' })).toBeEnabled({ timeout: 15000 });
+  return dialog;
+}
+
+for (const [app, label] of [['X', 'X-এ শেয়ার'], ['WhatsApp', 'হোয়াটসঅ্যাপে শেয়ার']]) {
+  test(`on a phone, ${app} shares the marksheet picture with my challenge link`, async ({ page }) => {
+    const dialog = await playWithShareSheet(page);
+    await dialog.getByRole('button', { name: label }).click();
+    await expect.poll(() => page.evaluate(() => window.__shared?.type)).toBe('image/png');
+    const text = await page.evaluate(() => window.__shared.text);
+    expect(text).toContain('৫%');
+    expect(unpackChallenge(new URL(text.match(/https?:\/\/\S+/)[0]).hash)?.name).toBe('রাফি');
+    expect(await page.evaluate(() => window.__opened)).toEqual([]);
+  });
+}
+
+test('on a phone, Facebook still opens its own share page with the link', async ({ page }) => {
+  const dialog = await playWithShareSheet(page);
+  await dialog.getByRole('button', { name: 'ফেসবুকে শেয়ার' }).click();
+  await expect.poll(() => page.evaluate(() => window.__opened.length)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.__opened.at(-1))).toContain('facebook.com/sharer');
+  expect(await page.evaluate(() => window.__shared)).toBeUndefined();
+});
+
+test.describe('on a computer', () => {
+  test.use({ isMobile: false, hasTouch: false, viewport: { width: 1280, height: 800 } });
+  test('X keeps opening the X post page with a link', async ({ page }) => {
+    const dialog = await playWithShareSheet(page);
+    await dialog.getByRole('button', { name: 'X-এ শেয়ার' }).click();
+    await expect.poll(() => page.evaluate(() => window.__opened.length)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.__opened.at(-1))).toContain('x.com/intent/tweet');
+    expect(await page.evaluate(() => window.__shared)).toBeUndefined();
+  });
 });
