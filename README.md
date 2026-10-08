@@ -12,17 +12,22 @@ A Bangla nostalgia checklist for people who grew up in 1990s–early 2000s Bangl
 
 1. **Tick memories.** 60 photo cards in 6 chapters: টিভি, টিফিন, স্কুল, খেলা, গ্যাজেট and ঈদ. Tap a card to give it a green teacher's tick.
 2. **Hand in your khata.** A sticky bar appears after the first tick. Tap it to open the result: a score, a funny title, and the class teacher's remark.
-3. **Share the marksheet.** A 1080×1350 "মার্কশিট" image shows your marks per subject, grades, total, a photo strip and a পাস/ফেল stamp. On phones it opens the share sheet; elsewhere it downloads.
-4. **Challenge a friend.** You get a link that carries your ticks and your name. Your friend plays first, then sees how you compare.
+3. **Get your marksheet.** A 1080×1350 "মার্কশিট" image shows your marks per subject, grades, total, a photo strip and a পাস/ফেল stamp.
+4. **Share and challenge.** Facebook, X and WhatsApp share your score with a challenge link that carries your ticks and name. Instagram, "more" and save use the marksheet picture. A friend who opens the link plays first, then sees how you compare.
 
-### Score titles
+### Grades (SSC scale)
 
-| Score | Title |
-|---|---|
-| ০–২৫% | ২০০০-এর পরের বাচ্চা 🍼 |
-| ২৬–৫০% | আধা নব্বই, আধা ইউটিউব 📱 |
-| ৫১–৮০% | পাক্কা নব্বইয়ের পোলাপান 🎒 |
-| ৮১%+ | বিটিভির লোগো তুমি নিজেই 📺 |
+| Score | Grade | Title |
+|---|---|---|
+| ৮০–১০০% | A+ | বিটিভির লোগো তুমি নিজেই 📺 |
+| ৭০–৭৯% | A | পাক্কা নব্বইয়ের পোলাপান 🎒 |
+| ৬০–৬৯% | A- | নব্বইয়ের ভালো ছাত্র 📚 |
+| ৫০–৫৯% | B | হাফ-টিফিন নব্বই 🍬 |
+| ৪০–৪৯% | C | আধা নব্বই, আধা ইউটিউব 📱 |
+| ৩৩–৩৯% | D | টেনেটুনে পাস 😅 |
+| ০–৩২% | F | ২০০০-এর পরের বাচ্চা 🍼 |
+
+Each grade has its own pool of teacher remarks. Subjects on the marksheet are graded on the same scale, and below 33% gets the red **ফেল** stamp.
 
 ## Privacy
 
